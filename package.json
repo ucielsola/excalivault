@@ -1,0 +1,23 @@
+{
+  "name": "excalivault",
+  "version": "1.0.0",
+  "description": "A Chrome extension vault for your Excalidraw drawings",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "svelte-kit dev",
+    "build": "svelte-kit build",
+    "export": "svelte-kit export"
+  },
+  "keywords": ["chrome-extension", "svelte", "excalidraw", "vault"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^2.0.0",
+    "@sveltejs/kit": "^2.0.0",
+    "svelte": "^4.0.0"
+  },
+  "dependencies": {
+    "@sveltejs/kit": "^2.0.0"
+  }
+}
