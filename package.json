@@ -1,23 +1,39 @@
 {
   "name": "excalivault",
-  "version": "1.0.0",
-  "description": "A Chrome extension vault for your Excalidraw drawings",
-  "main": "index.js",
+  "description": "Personal vault for storing Excalidraws",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "svelte-kit dev",
-    "build": "svelte-kit build",
-    "export": "svelte-kit export"
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "postinstall": "wxt prepare",
+    "clean": "git clean -fXd"
   },
-  "keywords": ["chrome-extension", "svelte", "excalidraw", "vault"],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {},
   "devDependencies": {
-    "@sveltejs/adapter-auto": "^2.0.0",
-    "@sveltejs/kit": "^2.0.0",
-    "svelte": "^4.0.0"
+    "@sveltejs/vite-plugin-svelte": "4.0.0-next.7",
+    "@tailwindcss/vite": "4.0.0-alpha.24",
+    "@tsconfig/svelte": "^5.0.7",
+    "@wxt-dev/module-svelte": "^2.0.4",
+    "daisyui": "^4.12.14",
+    "postcss": "^8.4.49",
+    "svelte": "5.0.0-next.245",
+    "svelte-check": "^4.3.6",
+    "tailwindcss": "4.0.0-alpha.24",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.5",
+    "wxt": "^0.20.18"
   },
-  "dependencies": {
-    "@sveltejs/kit": "^2.0.0"
+  "overrides": {
+    "@sveltejs/vite-plugin-svelte": "^4.0.0-next"
+  },
+  "resolutions": {
+    "@sveltejs/vite-plugin-svelte": "^4.0.0-next"
   }
 }
