@@ -1,9 +1,13 @@
 import { defineConfig } from 'wxt';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   srcDir: 'src',
   publicDir: 'src/public',
   modules: ['@wxt-dev/module-svelte'],
+  vite: () => ({
+    plugins: [tailwindcss()],
+  }),
   manifest: {
     name: 'Excalivault',
     description: 'Personal vault for storing Excalidraws',
