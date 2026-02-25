@@ -16,24 +16,21 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "4.0.0-next.7",
-    "@tailwindcss/vite": "4.0.0-alpha.24",
-    "@tsconfig/svelte": "^5.0.7",
+    "@sveltejs/vite-plugin-svelte": "^6.2.4",
+    "@tailwindcss/vite": "^4.2.1",
+    "@tsconfig/svelte": "^5.0.8",
     "@wxt-dev/module-svelte": "^2.0.4",
-    "daisyui": "^4.12.14",
-    "postcss": "^8.4.49",
-    "svelte": "5.0.0-next.245",
-    "svelte-check": "^4.3.6",
-    "tailwindcss": "4.0.0-alpha.24",
+    "daisyui": "^5.5.19",
+    "postcss": "^8.5.6",
+    "svelte": "^5.53.5",
+    "svelte-check": "^4.4.3",
+    "tailwindcss": "^4.2.1",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
-    "vite": "^5.4.5",
+    "vite": "^7.3.1",
     "wxt": "^0.20.18"
   },
-  "overrides": {
-    "@sveltejs/vite-plugin-svelte": "^4.0.0-next"
-  },
-  "resolutions": {
-    "@sveltejs/vite-plugin-svelte": "^4.0.0-next"
+  "volta": {
+    "node": "25.7.0"
   }
 }
