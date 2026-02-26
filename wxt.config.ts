@@ -29,6 +29,13 @@ export default defineConfig({
         '128': 'icon/128.png'
       }
     },
+    chrome_action: {
+      default_area: {
+        width: 400,
+        height: 300,
+        anchor: 'top_right'
+      }
+    },
     content_scripts: [
       {
         matches: ['https://excalidraw.com/*'],
