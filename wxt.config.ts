@@ -18,7 +18,7 @@ export default defineConfig({
     name: 'Excalivault',
     description: 'Personal vault for storing Excalidraws',
     version: '0.0.0',
-    permissions: ['storage'],
+    permissions: ['storage', 'scripting', 'activeTab'],
     action: {
       default_popup: 'popup.html',
       default_icon: {
