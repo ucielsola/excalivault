@@ -6,6 +6,20 @@ export default defineBackground({
   main() {
     const STORAGE_KEY = "excalivault_drawings";
     const DRAWING_TO_INJECT_KEY = "excalivault_drawing_to_inject";
+    const TARGET_URL = "https://excalidraw.com";
+
+    (browser as any).sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+
+    browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
+      if (!tab.url) return;
+
+      const isEnabled = tab.url.startsWith(TARGET_URL);
+      await (browser as any).sidePanel.setOptions({
+        tabId,
+        path: 'sidepanel.html',
+        enabled: isEnabled,
+      });
+    });
 
     async function getDrawings(): Promise<unknown[]> {
       const result = (await browser.storage.local.get(STORAGE_KEY)) as Record<

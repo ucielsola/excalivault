@@ -18,9 +18,8 @@ export default defineConfig({
     name: 'Excalivault',
     description: 'Personal vault for storing Excalidraws',
     version: '0.0.0',
-    permissions: ['storage', 'scripting', 'activeTab'],
+    permissions: ['storage', 'scripting', 'activeTab', 'sidePanel', 'tabs'],
     action: {
-      default_popup: 'popup.html',
       default_icon: {
         '16': 'icon/16.png',
         '32': 'icon/32.png',
@@ -29,13 +28,7 @@ export default defineConfig({
         '128': 'icon/128.png'
       }
     },
-    chrome_action: {
-      default_area: {
-        width: 400,
-        height: 300,
-        anchor: 'top_right'
-      }
-    },
+    side_panel: {},
     content_scripts: [
       {
         matches: ['https://excalidraw.com/*'],

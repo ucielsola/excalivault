@@ -1,7 +1,7 @@
 import '../../app.css';
-import Popup from './Popup.svelte';
+import SidePanel from './SidePanel.svelte';
 import { mount } from 'svelte';
 
-mount(Popup, {
+mount(SidePanel, {
   target: document.getElementById('app')!
 })

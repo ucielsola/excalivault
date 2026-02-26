@@ -107,7 +107,7 @@
   }
 </script>
 
-<div class="flex h-full flex-col">
+<div class="flex h-full min-w-[300px] max-w-[500px] flex-col overflow-hidden">
   {#if currentScreen === "vault"}
     <VaultList
       drawings={$drawings}
