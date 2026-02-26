@@ -1,7 +1,7 @@
 <script lang="ts">
-    import "../../app.css";
     import { onMount } from "svelte";
     import browser from "webextension-polyfill";
+
     import { drawings } from "$lib/stores";
     import { MessageType, type DrawingData } from "$lib/types";
 
@@ -18,7 +18,7 @@
 
     type Screen = (typeof Screens)[keyof typeof Screens];
 
-    let currentScreen = $derived(
+    let currentScreen = $derived<Screen>(
         drawings.list.length === 0 ? Screens.Empty : Screens.Vault,
     );
     let selectedDrawing = $state<DrawingData | null>(null);
