@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import browser from "webextension-polyfill";
 
-    import { drawings } from "$lib/stores";
+    import { drawings, browserTab } from "$lib/stores";
     import { MessageType, type DrawingData } from "$lib/types";
 
     import VaultList from "$lib/components/excalivault/VaultList.svelte";
@@ -24,12 +24,33 @@
     let selectedDrawing = $state<DrawingData | null>(null);
     let confirmOpenOpen = $state(false);
     let deleteConfirmOpen = $state(false);
+    let currentDrawingTitle = $state("");
 
     $inspect(drawings.list);
 
-    onMount(() => {
+    onMount(async () => {
         drawings.loadDrawings();
+        if (browserTab.isExcalidraw) {
+            getCurrentDrawingTitle();
+        }
     });
+
+    $effect(() => {
+        if (browserTab.isExcalidraw && !browserTab.loading) {
+            getCurrentDrawingTitle();
+        }
+    });
+
+    async function getCurrentDrawingTitle() {
+        try {
+            const currentData = await drawings.getCurrentDrawingData();
+            if (currentData?.title) {
+                currentDrawingTitle = currentData.title;
+            }
+        } catch (e) {
+            console.error("Failed to get drawing title", e);
+        }
+    }
 
     async function handleSave(name: string) {
         const currentData = await drawings.getCurrentDrawingData();
@@ -108,7 +129,12 @@
             onDelete={handleDelete}
         />
     {:else if currentScreen === Screens.Empty}
-        <EmptyVault />
+        <EmptyVault
+            onSave={handleSave}
+            isOnExcalidraw={browserTab.isExcalidraw}
+            loading={browserTab.loading}
+            drawingTitle={currentDrawingTitle}
+        />
     {/if}
 
     {#if confirmOpenOpen && selectedDrawing}

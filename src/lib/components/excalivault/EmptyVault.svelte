@@ -1,10 +1,39 @@
 <script lang="ts">
   import ShieldIcon from "@lucide/svelte/icons/shield";
   import FolderOpenIcon from "@lucide/svelte/icons/folder-open";
+  import SaveIcon from "@lucide/svelte/icons/save";
   import { Button } from "$lib/components/ui/button";
   import { Badge } from "$lib/components/ui/badge";
   import VaultLogo from "./VaultLogo.svelte";
+  import SaveCurrent from "./SaveCurrent.svelte";
   import browser from "webextension-polyfill";
+
+  let { 
+    onSave = (_name: string) => Promise.resolve(),
+    isOnExcalidraw = false,
+    loading = false,
+    drawingTitle = ""
+  }: { 
+    onSave: (name: string) => Promise<void>;
+    isOnExcalidraw: boolean;
+    loading: boolean;
+    drawingTitle?: string;
+  } = $props();
+
+  let saveDialogOpen = $state(false);
+
+  function handleOpenSaveDialog() {
+    saveDialogOpen = true;
+  }
+
+  function handleCancelSave() {
+    saveDialogOpen = false;
+  }
+
+  async function handleSave(name: string) {
+    await onSave(name);
+    saveDialogOpen = false;
+  }
 </script>
 
 <div class="flex h-full flex-col">
@@ -29,10 +58,22 @@
       </p>
     </div>
 
-    <Button variant="outline" class="gap-2" onclick={() => browser.tabs.create({ url: "https://excalidraw.com/" })}>
-      <FolderOpenIcon size={14} />
-      Open Excalidraw
-    </Button>
+    {#if loading}
+      <Button variant="outline" disabled class="gap-2">
+        <div class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground"></div>
+        Checking...
+      </Button>
+    {:else if isOnExcalidraw}
+      <Button variant="default" class="gap-2" onclick={handleOpenSaveDialog}>
+        <SaveIcon size={14} />
+        Save to Vault
+      </Button>
+    {:else}
+      <Button variant="outline" class="gap-2" onclick={() => browser.tabs.create({ url: "https://excalidraw.com/" })}>
+        <FolderOpenIcon size={14} />
+        Open Excalidraw
+      </Button>
+    {/if}
   </div>
 
   <div class="border-t border-border px-4 py-2">
@@ -40,4 +81,11 @@
       0 drawings in vault
     </p>
   </div>
+
+  <SaveCurrent 
+    open={saveDialogOpen} 
+    {drawingTitle} 
+    onSave={handleSave} 
+    onCancel={handleCancelSave} 
+  />
 </div>
