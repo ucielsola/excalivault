@@ -1,138 +1,131 @@
 <script lang="ts">
-  import "../../app.css";
-  import { onMount } from "svelte";
-  import browser from "webextension-polyfill";
-  import {
-    drawings,
-    loadDrawings,
-    deleteDrawing,
-    getCurrentDrawingData,
-    saveDrawing,
-    isLoading,
-    error,
-  } from "$lib/stores/drawings";
-  import { MessageType, type DrawingData } from "$lib/types";
-  
-  import VaultList from "$lib/components/excalivault/VaultList.svelte";
-  import EmptyVault from "$lib/components/excalivault/EmptyVault.svelte";
-  import ConfirmOpen from "$lib/components/excalivault/ConfirmOpen.svelte";
-  import DeleteConfirm from "$lib/components/excalivault/DeleteConfirm.svelte";
+    import "../../app.css";
+    import { onMount } from "svelte";
+    import browser from "webextension-polyfill";
+    import { drawings } from "$lib/stores";
+    import { MessageType, type DrawingData } from "$lib/types";
 
-  type Screen = "vault" | "save" | "empty";
+    import VaultList from "$lib/components/excalivault/VaultList.svelte";
+    import EmptyVault from "$lib/components/excalivault/EmptyVault.svelte";
+    import ConfirmOpen from "$lib/components/excalivault/ConfirmOpen.svelte";
+    import DeleteConfirm from "$lib/components/excalivault/DeleteConfirm.svelte";
 
-  let currentScreen = $state<Screen>("vault");
-  let selectedDrawing = $state<DrawingData | null>(null);
-  let confirmOpenOpen = $state(false);
-  let deleteConfirmOpen = $state(false);
+    const Screens = {
+        Vault: "vault",
+        Save: "save",
+        Empty: "empty",
+    } as const;
 
-  onMount(() => {
-    loadDrawings();
-  });
+    type Screen = (typeof Screens)[keyof typeof Screens];
 
-  const determinedScreen = $derived(() => {
-    if ($drawings.length === 0) return "empty";
-    return "vault";
-  });
+    let currentScreen = $derived(
+        drawings.list.length === 0 ? Screens.Empty : Screens.Vault,
+    );
+    let selectedDrawing = $state<DrawingData | null>(null);
+    let confirmOpenOpen = $state(false);
+    let deleteConfirmOpen = $state(false);
 
-  $effect(() => {
-    currentScreen = determinedScreen();
-  });
+    $inspect(drawings.list);
 
-  async function handleSave(name: string) {
-    const currentData = await getCurrentDrawingData();
-    if (!currentData?.id) return;
-
-    await saveDrawing({
-      id: currentData.id,
-      name,
-      elements: currentData.elements,
-      appState: currentData.appState,
-      versionFiles: "",
-      versionDataState: "",
+    onMount(() => {
+        drawings.loadDrawings();
     });
-  }
 
-  function handleOpen(drawing: DrawingData) {
-    selectedDrawing = drawing;
-    confirmOpenOpen = true;
-  }
+    async function handleSave(name: string) {
+        const currentData = await drawings.getCurrentDrawingData();
+        if (!currentData?.id) return;
 
-  async function confirmOpen() {
-    if (!selectedDrawing) return;
-
-    try {
-      await browser.runtime.sendMessage({
-        type: MessageType.OPEN_DRAWING,
-        payload: {
-          id: selectedDrawing.id,
-          name: selectedDrawing.name,
-          elements: selectedDrawing.elements,
-          appState: selectedDrawing.appState,
-          versionFiles: selectedDrawing.versionFiles,
-          versionDataState: selectedDrawing.versionDataState,
-        },
-      });
-    } catch (e) {
-      console.error("Failed to open drawing", e);
+        await drawings.saveDrawing({
+            id: currentData.id,
+            name,
+            elements: currentData.elements,
+            appState: currentData.appState,
+            versionFiles: "",
+            versionDataState: "",
+        });
     }
 
-    selectedDrawing = null;
-    confirmOpenOpen = false;
-  }
+    function handleOpen(drawing: DrawingData) {
+        selectedDrawing = drawing;
+        confirmOpenOpen = true;
+    }
 
-  function cancelOpen() {
-    selectedDrawing = null;
-    confirmOpenOpen = false;
-  }
+    async function confirmOpen() {
+        if (!selectedDrawing) return;
 
-  async function handleDelete(id: string) {
-    const drawing = $drawings.find((d) => d.id === id);
-    if (!drawing) return;
+        try {
+            await browser.runtime.sendMessage({
+                type: MessageType.OPEN_DRAWING,
+                payload: {
+                    id: selectedDrawing.id,
+                    name: selectedDrawing.name,
+                    elements: selectedDrawing.elements,
+                    appState: selectedDrawing.appState,
+                    versionFiles: selectedDrawing.versionFiles,
+                    versionDataState: selectedDrawing.versionDataState,
+                },
+            });
+        } catch (e) {
+            console.error("Failed to open drawing", e);
+        }
 
-    selectedDrawing = drawing;
-    deleteConfirmOpen = true;
-  }
+        selectedDrawing = null;
+        confirmOpenOpen = false;
+    }
 
-  async function confirmDelete() {
-    if (!selectedDrawing) return;
+    function cancelOpen() {
+        selectedDrawing = null;
+        confirmOpenOpen = false;
+    }
 
-    await deleteDrawing(selectedDrawing.id);
-    selectedDrawing = null;
-    deleteConfirmOpen = false;
-  }
+    async function handleDelete(id: string) {
+        const drawing = drawings.list.find((d) => d.id === id);
+        if (!drawing) return;
 
-  function cancelDelete() {
-    selectedDrawing = null;
-    deleteConfirmOpen = false;
-  }
+        selectedDrawing = drawing;
+        deleteConfirmOpen = true;
+    }
+
+    async function confirmDelete() {
+        if (!selectedDrawing) return;
+
+        await drawings.deleteDrawing(selectedDrawing.id);
+        selectedDrawing = null;
+        deleteConfirmOpen = false;
+    }
+
+    function cancelDelete() {
+        selectedDrawing = null;
+        deleteConfirmOpen = false;
+    }
 </script>
 
-<div class="flex h-full min-w-[300px] max-w-[500px] flex-col overflow-hidden">
-  {#if currentScreen === "vault"}
-    <VaultList
-      drawings={$drawings}
-      onOpen={handleOpen}
-      onDelete={handleDelete}
-    />
-  {:else if currentScreen === "empty"}
-    <EmptyVault />
-  {/if}
+<div class="flex h-full min-w-75 flex-col overflow-hidden">
+    {#if currentScreen === Screens.Vault}
+        <VaultList
+            drawings={drawings.list}
+            onOpen={handleOpen}
+            onDelete={handleDelete}
+        />
+    {:else if currentScreen === Screens.Empty}
+        <EmptyVault />
+    {/if}
 
-  {#if confirmOpenOpen && selectedDrawing}
-    <ConfirmOpen
-      open={confirmOpenOpen}
-      drawingName={selectedDrawing.name}
-      onConfirm={confirmOpen}
-      onCancel={cancelOpen}
-    />
-  {/if}
+    {#if confirmOpenOpen && selectedDrawing}
+        <ConfirmOpen
+            open={confirmOpenOpen}
+            drawingName={selectedDrawing.name}
+            onConfirm={confirmOpen}
+            onCancel={cancelOpen}
+        />
+    {/if}
 
-  {#if deleteConfirmOpen && selectedDrawing}
-    <DeleteConfirm
-      open={deleteConfirmOpen}
-      drawingName={selectedDrawing.name}
-      onConfirm={confirmDelete}
-      onCancel={cancelDelete}
-    />
-  {/if}
+    {#if deleteConfirmOpen && selectedDrawing}
+        <DeleteConfirm
+            open={deleteConfirmOpen}
+            drawingName={selectedDrawing.name}
+            onConfirm={confirmDelete}
+            onCancel={cancelDelete}
+        />
+    {/if}
 </div>

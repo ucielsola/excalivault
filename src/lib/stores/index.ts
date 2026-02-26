@@ -1,1 +1,1 @@
-export { drawings } from "./drawings";
+export { drawings } from "$lib/stores/drawings.svelte";

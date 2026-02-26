@@ -77,3 +77,39 @@ export type InjectDrawingDataMessage = {
     versionDataState: string;
   };
 };
+
+export type GetAllDrawingsResponse = {
+  drawings: DrawingData[];
+};
+
+export type GetDrawingDataResponse = {
+  id: string | null;
+  title: string | null;
+  elements: string;
+  appState: string;
+};
+
+export type SaveDrawingResponse = {
+  drawings: DrawingData[];
+};
+
+export type DeleteDrawingResponse = {
+  drawings: DrawingData[];
+};
+
+export type SaveDrawingData = {
+  id: string;
+  name: string;
+  elements: string;
+  appState: string;
+  versionFiles: string;
+  versionDataState: string;
+};
+
+export type DrawingMessage =
+  | GetDrawingDataMessage
+  | SaveDrawingMessage
+  | GetAllDrawingsMessage
+  | DeleteDrawingMessage
+  | OpenDrawingMessage
+  | InjectDrawingDataMessage;
