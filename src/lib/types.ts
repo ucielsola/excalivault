@@ -90,6 +90,7 @@ export type GetDrawingDataResponse = {
 };
 
 export type SaveDrawingResponse = {
+  success: boolean;
   drawings: DrawingData[];
 };
 

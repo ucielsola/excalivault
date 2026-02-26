@@ -25,6 +25,12 @@ zip:firefox:
 check:
   pnpm check
 
+lint:
+  pnpm lint
+
+format:
+  pnpm format
+
 clean:
   rm -rf .wxt .output
 

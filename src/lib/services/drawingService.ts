@@ -1,18 +1,20 @@
 import browser from "webextension-polyfill";
+
 import {
+  MessageType,
+  type DeleteDrawingResponse,
   type DrawingData,
+  type DrawingMessage,
   type GetAllDrawingsResponse,
   type GetDrawingDataResponse,
-  type SaveDrawingResponse,
-  type DeleteDrawingResponse,
   type SaveDrawingData,
-  type DrawingMessage,
-  MessageType,
+  type SaveDrawingResponse,
 } from "$lib/types";
 
 class DrawingService {
   private async sendMessage<T>(message: DrawingMessage): Promise<T> {
-    return (await browser.runtime.sendMessage(message)) as T;
+    const response = (await browser.runtime.sendMessage(message)) as T;
+    return response;
   }
 
   public async loadDrawings(): Promise<DrawingData[]> {

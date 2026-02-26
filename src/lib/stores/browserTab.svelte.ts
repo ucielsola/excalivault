@@ -1,5 +1,7 @@
-import { browserTabService } from "$lib/services/browserTabService";
 import browser from "webextension-polyfill";
+
+import { browserTabService } from "$lib/services/browserTabService";
+import { captureException } from "$lib/services/sentry";
 
 class BrowserTabStore {
   #isExcalidraw = $state<boolean>(false);
@@ -36,7 +38,7 @@ class BrowserTabStore {
         this.#tabId = currentTab.id || null;
       }
     } catch (e) {
-      console.error("Failed to check current tab", e);
+      captureException(e as Error);
     } finally {
       this.#loading = false;
     }
@@ -45,7 +47,6 @@ class BrowserTabStore {
   async checkTabById(tabId: number) {
     try {
       const tab = await browser.tabs.get(tabId);
-      console.log("Checking tab:", tab);
       if (tab.url?.includes("excalidraw.com")) {
         this.#isExcalidraw = true;
         this.#tabId = tabId;
@@ -54,7 +55,7 @@ class BrowserTabStore {
         this.#tabId = null;
       }
     } catch (e) {
-      console.error("Failed to check tab by id", e);
+      captureException(e as Error);
     }
   }
 

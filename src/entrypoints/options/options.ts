@@ -1,10 +1,13 @@
-import '../../app.css';
-import Options from './Options.svelte';
-import { mount } from 'svelte';
-import { initSentry } from '$lib/services/sentry';
+import "../../app.css";
+
+import { mount } from "svelte";
+
+import { initSentry } from "$lib/services/sentry";
+
+import Options from "./Options.svelte";
 
 initSentry();
 
 mount(Options, {
-  target: document.getElementById('app')!
-})
+  target: document.getElementById("app")!,
+});

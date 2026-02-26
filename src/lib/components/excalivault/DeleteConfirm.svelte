@@ -1,15 +1,24 @@
 <script lang="ts">
   import Trash2Icon from "@lucide/svelte/icons/trash-2";
+
   import { Button } from "$lib/components/ui/button";
-  import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "$lib/components/ui/dialog";
+  import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+  } from "$lib/components/ui/dialog";
+
   import VaultLogo from "./VaultLogo.svelte";
 
-  let { 
+  let {
     open = false,
     drawingName = "",
     onConfirm = () => {},
-    onCancel = () => {}
-  }: { 
+    onCancel = () => {},
+  }: {
     open: boolean;
     drawingName: string;
     onConfirm: () => void;
@@ -18,7 +27,9 @@
 </script>
 
 <div class="flex h-full flex-col">
-  <div class="flex items-center justify-between border-b border-border px-4 py-3">
+  <div
+    class="border-border flex items-center justify-between border-b px-4 py-3"
+  >
     <VaultLogo size="small" />
   </div>
 
@@ -26,7 +37,9 @@
     <DialogContent class="max-w-[300px]">
       <DialogHeader>
         <div class="flex items-center gap-2.5">
-          <div class="flex h-8 w-8 items-center justify-center rounded-md bg-destructive/10">
+          <div
+            class="bg-destructive/10 flex h-8 w-8 items-center justify-center rounded-md"
+          >
             <Trash2Icon size={16} class="text-destructive" />
           </div>
           <DialogTitle>Delete drawing?</DialogTitle>
@@ -34,12 +47,15 @@
       </DialogHeader>
 
       <DialogDescription>
-        Are you sure you want to permanently delete <span class="font-medium text-foreground">"{drawingName}"</span>? This action cannot be undone.
+        Are you sure you want to permanently delete <span
+          class="text-foreground font-medium">"{drawingName}"</span
+        >? This action cannot be undone.
       </DialogDescription>
 
       <DialogFooter>
         <Button variant="outline" onclick={onCancel}>Keep it</Button>
-        <Button variant="destructive" onclick={onConfirm}>Delete forever</Button>
+        <Button variant="destructive" onclick={onConfirm}>Delete forever</Button
+        >
       </DialogFooter>
     </DialogContent>
   </Dialog>

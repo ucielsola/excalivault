@@ -1,7 +1,21 @@
 import { defineBackground } from "#imports";
 import browser from "webextension-polyfill";
-import { MessageType } from "$lib/types";
-import { initSentry, captureException } from "$lib/services/sentry";
+
+import { captureException, initSentry } from "$lib/services/sentry";
+import { MessageType, type DrawingMessage } from "$lib/types";
+
+interface SidePanelBrowser {
+  sidePanel: {
+    setPanelBehavior: (options: {
+      openPanelOnActionClick: boolean;
+    }) => Promise<void>;
+    setOptions: (options: {
+      tabId: number;
+      path: string;
+      enabled: boolean;
+    }) => Promise<void>;
+  };
+}
 
 export default defineBackground({
   main() {
@@ -10,15 +24,17 @@ export default defineBackground({
     const DRAWING_TO_INJECT_KEY = "excalivault_drawing_to_inject";
     const TARGET_URL = "https://excalidraw.com";
 
-    (browser as any).sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+    (browser as unknown as SidePanelBrowser).sidePanel.setPanelBehavior({
+      openPanelOnActionClick: true,
+    });
 
     browser.tabs.onUpdated.addListener(async (tabId, info, tab) => {
       if (!tab.url) return;
 
       const isEnabled = tab.url.startsWith(TARGET_URL);
-      await (browser as any).sidePanel.setOptions({
+      await (browser as unknown as SidePanelBrowser).sidePanel.setOptions({
         tabId,
-        path: 'sidepanel.html',
+        path: "sidepanel.html",
         enabled: isEnabled,
       });
     });
@@ -44,14 +60,20 @@ export default defineBackground({
     }
 
     browser.runtime.onMessage.addListener(
-      (message: any, _sender: browser.Runtime.MessageSender) => {
+      (message: unknown, _sender: browser.Runtime.MessageSender) => {
         try {
-          if (message.type === MessageType.GET_ALL_DRAWINGS) {
+          if (!message || typeof message !== "object" || !("type" in message)) {
+            return Promise.resolve(null);
+          }
+
+          const typedMessage = message as DrawingMessage;
+
+          if (typedMessage.type === MessageType.GET_ALL_DRAWINGS) {
             return getDrawings().then((drawings) => ({ drawings }));
           }
 
-          if (message.type === MessageType.SAVE_DRAWING) {
-            const payload = message.payload as {
+          if (typedMessage.type === MessageType.SAVE_DRAWING) {
+            const payload = typedMessage.payload as {
               id: string;
               name: string;
               elements: string;
@@ -79,7 +101,8 @@ export default defineBackground({
                 viewBackgroundColor: payload.viewBackgroundColor,
                 createdAt:
                   existingIndex >= 0
-                    ? (drawings[existingIndex] as { createdAt: number }).createdAt
+                    ? (drawings[existingIndex] as { createdAt: number })
+                        .createdAt
                     : now,
                 updatedAt: now,
               };
@@ -95,8 +118,8 @@ export default defineBackground({
             });
           }
 
-          if (message.type === MessageType.DELETE_DRAWING) {
-            const payload = message.payload as { id: string };
+          if (typedMessage.type === MessageType.DELETE_DRAWING) {
+            const payload = typedMessage.payload as { id: string };
 
             return getDrawings().then(async (drawings: unknown[]) => {
               const filtered = (drawings as { id: string }[]).filter(
@@ -110,7 +133,9 @@ export default defineBackground({
           if (message.type === MessageType.GET_DRAWING_DATA) {
             return getActiveTab().then(async (tab: unknown) => {
               const tabObj = tab as { id?: number };
-              if (!tabObj?.id) return { error: "No active tab" };
+              if (!tabObj?.id) {
+                return { error: "No active tab" };
+              }
 
               try {
                 const [result] = await browser.scripting.executeScript({
@@ -140,14 +165,15 @@ export default defineBackground({
               } catch (error) {
                 captureException(error as Error);
                 return {
-                  error: "Failed to get drawing data. Are you on excalidraw.com?",
+                  error:
+                    "Failed to get drawing data. Are you on excalidraw.com?",
                 };
               }
             });
           }
 
-          if (message.type === MessageType.OPEN_DRAWING) {
-            const payload = message.payload as {
+          if (typedMessage.type === MessageType.OPEN_DRAWING) {
+            const payload = typedMessage.payload as {
               id: string;
               name: string;
               elements: string;
@@ -156,24 +182,26 @@ export default defineBackground({
               versionDataState: string;
             };
 
-            return browser.storage.local.set({
-              [DRAWING_TO_INJECT_KEY]: payload,
-            }).then(async () => {
-              const tab = await browser.tabs.create({
-                url: "https://excalidraw.com/",
+            return browser.storage.local
+              .set({
+                [DRAWING_TO_INJECT_KEY]: payload,
+              })
+              .then(async () => {
+                await browser.tabs.create({
+                  url: "https://excalidraw.com/",
+                });
+                return { success: true };
               });
-              return { success: true };
-            });
           }
 
           return Promise.resolve(null);
         } catch (error) {
           captureException(error as Error);
-          return Promise.resolve({ error: "Unexpected error in background script" });
+          return Promise.resolve({
+            error: "Unexpected error in background script",
+          });
         }
       },
     );
-
-    console.log("Excalivault background script loaded");
   },
 });

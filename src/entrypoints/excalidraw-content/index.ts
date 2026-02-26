@@ -1,15 +1,17 @@
 import { defineContentScript } from "#imports";
 import browser from "webextension-polyfill";
-import { initSentry, captureException } from "$lib/services/sentry";
+
+import {
+  captureException,
+  captureMessage,
+  initSentry,
+} from "$lib/services/sentry";
 
 export default defineContentScript({
   matches: ["https://excalidraw.com/*"],
   main() {
     initSentry({
-      allowUrls: [
-        /chrome-extension:\/\/[a-z]+/,
-        /moz-extension:\/\/[a-z]+/,
-      ],
+      allowUrls: [/chrome-extension:\/\/[a-z]+/, /moz-extension:\/\/[a-z]+/],
     });
     const DRAWING_TO_INJECT_KEY = "excalivault_drawing_to_inject";
 
@@ -26,11 +28,21 @@ export default defineContentScript({
         } | null;
 
         if (!dataToInject) {
-          console.log("[Excalivault] No drawing data to inject");
+          captureMessage("[Excalivault] No drawing data to inject", "info", {
+            serviceName: "excalidraw-content",
+            methodName: "injectDrawingData",
+          });
           return;
         }
 
-        console.log("[Excalivault] Injecting drawing data:", dataToInject.name);
+        captureMessage(
+          "[Excalivault] Injecting drawing data: " + dataToInject.name,
+          "info",
+          {
+            serviceName: "excalidraw-content",
+            methodName: "injectDrawingData",
+          },
+        );
 
         localStorage.setItem("excalidraw", dataToInject.elements);
         localStorage.setItem("excalidraw-state", dataToInject.appState);
@@ -40,20 +52,37 @@ export default defineContentScript({
           localStorage.setItem("version-files", dataToInject.versionFiles);
         }
         if (dataToInject.versionDataState) {
-          localStorage.setItem("version-dataState", dataToInject.versionDataState);
+          localStorage.setItem(
+            "version-dataState",
+            dataToInject.versionDataState,
+          );
         }
 
         await browser.storage.local.remove(DRAWING_TO_INJECT_KEY);
 
-        console.log("[Excalivault] Drawing data injected, reloading page...");
+        captureMessage(
+          "[Excalivault] Drawing data injected, reloading page...",
+          "info",
+          {
+            serviceName: "excalidraw-content",
+            methodName: "injectDrawingData",
+          },
+        );
         window.location.reload();
       } catch (error) {
-        captureException(error as Error);
+        captureException(error as Error, {
+          serviceName: "excalidraw-content",
+          methodName: "injectDrawingData",
+        });
         console.error("[Excalivault] Failed to inject drawing data:", error);
       }
     }
 
-    console.log("[Excalivault] Content script running at:", document.readyState);
+    captureMessage(
+      "[Excalivault] Content script running at: " + document.readyState,
+      "info",
+      { serviceName: "excalidraw-content", methodName: "main" },
+    );
     injectDrawingData();
   },
 });

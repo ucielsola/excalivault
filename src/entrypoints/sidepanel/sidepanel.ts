@@ -1,7 +1,10 @@
 import "../../app.css";
-import App from "./App.svelte";
+
 import { mount } from "svelte";
+
 import { initSentry } from "$lib/services/sentry";
+
+import App from "./App.svelte";
 
 initSentry();
 

@@ -1,0 +1,45 @@
+{
+  "format_on_save": "on",
+  "formatter": "auto",
+  "languages": {
+    "Svelte": {
+      "language_servers": [
+        "svelte-language-server",
+        "tailwindcss-language-server",
+        "eslint"
+      ],
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
+    "TypeScript": {
+      "language_servers": ["typescript-language-server", "eslint"],
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
+    "JavaScript": {
+      "language_servers": ["typescript-language-server", "eslint"],
+      "code_actions_on_format": {
+        "source.fixAll.eslint": true
+      }
+    },
+    "JSON": {
+      "formatter": "auto"
+    }
+  },
+  "lsp": {
+    "tailwindcss-language-server": {
+      "settings": {
+        "tailwindCSS": {
+          "includeLanguages": {
+            "svelte": "html"
+          },
+          "experimental": {
+            "classRegex": ["class:\\s*[\"']([^\"']*)[\"']"]
+          }
+        }
+      }
+    }
+  }
+}

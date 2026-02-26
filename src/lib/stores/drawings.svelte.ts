@@ -1,5 +1,10 @@
 import { drawingService } from "$lib/services/drawingService";
-import { type DrawingData, type GetDrawingDataResponse, type SaveDrawingData } from "$lib/types";
+import { captureException } from "$lib/services/sentry";
+import {
+  type DrawingData,
+  type GetDrawingDataResponse,
+  type SaveDrawingData,
+} from "$lib/types";
 
 class DrawingsStore {
   #loading = $state<boolean>(false);
@@ -14,7 +19,7 @@ class DrawingsStore {
       this.#list = await drawingService.loadDrawings();
     } catch (e) {
       this.#error = "Failed to load drawings";
-      console.error(e);
+      captureException(e as Error);
     } finally {
       this.#loading = false;
     }
@@ -30,10 +35,11 @@ class DrawingsStore {
 
   public async getCurrentDrawingData(): Promise<GetDrawingDataResponse | null> {
     try {
-      return await drawingService.getCurrentDrawingData();
+      const result = await drawingService.getCurrentDrawingData();
+      return result;
     } catch (e) {
       this.#error = "Failed to get drawing data. Are you on excalidraw.com?";
-      console.error(e);
+      captureException(e as Error);
       return null;
     }
   }
@@ -47,7 +53,7 @@ class DrawingsStore {
       await this.loadDrawings();
     } catch (e) {
       this.#error = "Failed to save drawing";
-      console.error(e);
+      captureException(e as Error);
     } finally {
       this.#loading = false;
     }
@@ -62,7 +68,7 @@ class DrawingsStore {
       await this.loadDrawings();
     } catch (e) {
       this.#error = "Failed to delete drawing";
-      console.error(e);
+      captureException(e as Error);
     } finally {
       this.#loading = false;
     }

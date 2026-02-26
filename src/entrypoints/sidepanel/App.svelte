@@ -1,7 +1,7 @@
 <script>
-    import "../../app.css";
+  import "../../app.css";
 
-    import Excalivault from "$lib/components/excalivault/Excalivault.svelte";
+  import Excalivault from "$lib/components/excalivault/Excalivault.svelte";
 </script>
 
 <Excalivault />
