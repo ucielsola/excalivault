@@ -6,21 +6,38 @@
   import { Badge } from "$lib/components/ui/badge";
   import VaultLogo from "./VaultLogo.svelte";
   import SaveCurrent from "./SaveCurrent.svelte";
+  import { drawings, browserTab } from "$lib/stores";
   import browser from "webextension-polyfill";
 
   let { 
-    onSave = (_name: string) => Promise.resolve(),
-    isOnExcalidraw = false,
-    loading = false,
-    drawingTitle = ""
+    children,
+    header,
+    footer
   }: { 
-    onSave: (name: string) => Promise<void>;
-    isOnExcalidraw: boolean;
-    loading: boolean;
-    drawingTitle?: string;
+    children?: any;
+    header?: any;
+    footer?: any;
   } = $props();
 
   let saveDialogOpen = $state(false);
+  let currentDrawingTitle = $state("");
+
+  $effect(() => {
+    if (browserTab.isExcalidraw && !browserTab.loading) {
+      getCurrentDrawingTitle();
+    }
+  });
+
+  async function getCurrentDrawingTitle() {
+    try {
+      const currentData = await drawings.getCurrentDrawingData();
+      if (currentData?.title) {
+        currentDrawingTitle = currentData.title;
+      }
+    } catch (e) {
+      console.error("Failed to get drawing title", e);
+    }
+  }
 
   function handleOpenSaveDialog() {
     saveDialogOpen = true;
@@ -31,17 +48,30 @@
   }
 
   async function handleSave(name: string) {
-    await onSave(name);
+    const currentData = await drawings.getCurrentDrawingData();
+    if (!currentData?.id) return;
+
+    await drawings.saveDrawing({
+      id: currentData.id,
+      name,
+      elements: currentData.elements,
+      appState: currentData.appState,
+      versionFiles: "",
+      versionDataState: "",
+    });
+
     saveDialogOpen = false;
   }
 </script>
 
-<div class="flex h-full flex-col">
+{#snippet defaultHeader()}
   <div class="flex items-center justify-between border-b border-border px-4 py-3">
     <VaultLogo size="small" />
     <Badge variant="secondary" class="font-mono text-[10px]">v1.0</Badge>
   </div>
+{/snippet}
 
+{#snippet defaultContent()}
   <div class="flex flex-1 flex-col items-center justify-center gap-4 p-6">
     <div class="relative">
       <div class="absolute -inset-4 rounded-full bg-primary/5"></div>
@@ -58,12 +88,12 @@
       </p>
     </div>
 
-    {#if loading}
+    {#if browserTab.loading}
       <Button variant="outline" disabled class="gap-2">
         <div class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground"></div>
         Checking...
       </Button>
-    {:else if isOnExcalidraw}
+    {:else if browserTab.isExcalidraw}
       <Button variant="default" class="gap-2" onclick={handleOpenSaveDialog}>
         <SaveIcon size={14} />
         Save to Vault
@@ -75,17 +105,39 @@
       </Button>
     {/if}
   </div>
+{/snippet}
 
+{#snippet defaultFooter()}
   <div class="border-t border-border px-4 py-2">
     <p class="text-center font-mono text-[10px] text-muted-foreground/50">
       0 drawings in vault
     </p>
   </div>
+{/snippet}
 
-  <SaveCurrent 
-    open={saveDialogOpen} 
-    {drawingTitle} 
-    onSave={handleSave} 
-    onCancel={handleCancelSave} 
-  />
+<div class="flex h-full flex-col">
+  {#if header}
+    {@render header()}
+  {:else}
+    {@render defaultHeader()}
+  {/if}
+
+  {#if children}
+    {@render children()}
+  {:else}
+    {@render defaultContent()}
+  {/if}
+
+  {#if footer}
+    {@render footer()}
+  {:else}
+    {@render defaultFooter()}
+  {/if}
 </div>
+
+<SaveCurrent 
+  open={saveDialogOpen} 
+  drawingTitle={currentDrawingTitle} 
+  onSave={handleSave} 
+  onCancel={handleCancelSave} 
+/>
