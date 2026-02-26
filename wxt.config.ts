@@ -1,5 +1,6 @@
 import { defineConfig } from 'wxt';
 import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
 export default defineConfig({
   srcDir: 'src',
@@ -7,6 +8,11 @@ export default defineConfig({
   modules: ['@wxt-dev/module-svelte'],
   vite: () => ({
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        $lib: path.resolve(__dirname, './src/lib'),
+      },
+    },
   }),
   manifest: {
     name: 'Excalivault',
