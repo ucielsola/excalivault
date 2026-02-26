@@ -14,11 +14,11 @@
     "postinstall": "wxt prepare",
     "clean": "git clean -fXd"
   },
-  "dependencies": {},
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/vite": "^4.2.1",
     "@tsconfig/svelte": "^5.0.8",
+    "@types/webextension-polyfill": "^0.12.5",
     "@wxt-dev/module-svelte": "^2.0.4",
     "daisyui": "^5.5.19",
     "postcss": "^8.5.6",
@@ -32,5 +32,8 @@
   },
   "volta": {
     "node": "25.7.0"
+  },
+  "dependencies": {
+    "webextension-polyfill": "^0.12.0"
   }
 }
