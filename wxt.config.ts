@@ -28,6 +28,14 @@ export default defineConfig({
         '96': 'icon/96.png',
         '128': 'icon/128.png'
       }
-    }
+    },
+    content_scripts: [
+      {
+        matches: ['https://excalidraw.com/*'],
+        js: ['excalidraw-content.js'],
+        run_at: 'document_start',
+        all_frames: true
+      }
+    ]
   }
 });

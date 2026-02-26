@@ -23,6 +23,8 @@ export enum MessageType {
   SAVE_DRAWING = "SAVE_DRAWING",
   GET_ALL_DRAWINGS = "GET_ALL_DRAWINGS",
   DELETE_DRAWING = "DELETE_DRAWING",
+  OPEN_DRAWING = "OPEN_DRAWING",
+  INJECT_DRAWING_DATA = "INJECT_DRAWING_DATA",
 }
 
 export type GetDrawingDataMessage = {
@@ -51,5 +53,27 @@ export type DeleteDrawingMessage = {
   type: MessageType.DELETE_DRAWING;
   payload: {
     id: string;
+  };
+};
+
+export type OpenDrawingMessage = {
+  type: MessageType.OPEN_DRAWING;
+  payload: {
+    id: string;
+    name: string;
+    elements: string;
+    appState: string;
+    versionFiles: string;
+    versionDataState: string;
+  };
+};
+
+export type InjectDrawingDataMessage = {
+  type: MessageType.INJECT_DRAWING_DATA;
+  payload: {
+    elements: string;
+    appState: string;
+    versionFiles: string;
+    versionDataState: string;
   };
 };

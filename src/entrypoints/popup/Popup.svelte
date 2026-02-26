@@ -21,6 +21,7 @@
     } | null>(null);
     let saveName = $state("");
     let activeTab = $state<"vault" | "current">("vault");
+    let drawingToOpen = $state<DrawingData | null>(null);
 
     onMount(() => {
         loadDrawings();
@@ -58,36 +59,33 @@
     }
 
     async function openDrawing(drawing: DrawingData) {
+        drawingToOpen = drawing;
+    }
+
+    async function confirmOpenDrawing() {
+        if (!drawingToOpen) return;
+
         try {
-            const elements = JSON.parse(drawing.elements);
-            const appState = JSON.parse(drawing.appState);
-            let files = {};
-            
-            if (drawing.versionFiles) {
-                try {
-                    files = JSON.parse(drawing.versionFiles);
-                } catch (e) {
-                    console.warn("Failed to parse versionFiles", e);
-                }
-            }
-
-            const excalidrawData = {
-                type: "excalidraw",
-                version: 2,
-                source: "https://excalidraw.com",
-                elements,
-                appState,
-                files
-            };
-
-            const jsonStr = JSON.stringify(excalidrawData);
-            const base64 = btoa(jsonStr);
-            const url = `https://excalidraw.com/#json=${base64}`;
-
-            await browser.tabs.create({ url });
+            await browser.runtime.sendMessage({
+                type: MessageType.OPEN_DRAWING,
+                payload: {
+                    id: drawingToOpen.id,
+                    name: drawingToOpen.name,
+                    elements: drawingToOpen.elements,
+                    appState: drawingToOpen.appState,
+                    versionFiles: drawingToOpen.versionFiles,
+                    versionDataState: drawingToOpen.versionDataState,
+                },
+            });
         } catch (e) {
             console.error("Failed to open drawing", e);
         }
+
+        drawingToOpen = null;
+    }
+
+    function cancelOpenDrawing() {
+        drawingToOpen = null;
     }
 </script>
 
@@ -252,4 +250,35 @@
             </div>
         {/if}
     </div>
+
+    {#if drawingToOpen}
+        <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div class="bg-zinc-800 rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+                <h2 class="text-lg font-bold text-white mb-2">
+                    Open Drawing
+                </h2>
+                <p class="text-zinc-300 mb-4">
+                    This will overwrite your current canvas with "{drawingToOpen.name}".
+                    Any unsaved changes will be lost.
+                </p>
+                <p class="text-xs text-zinc-500 mb-4">
+                    Note: All open Excalidraw tabs share the same storage.
+                </p>
+                <div class="flex gap-2">
+                    <button
+                        onclick={cancelOpenDrawing}
+                        class="flex-1 px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-white rounded transition-colors"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onclick={confirmOpenDrawing}
+                        class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                    >
+                        Open
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
 </div>

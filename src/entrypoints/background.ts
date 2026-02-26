@@ -5,6 +5,7 @@ import { MessageType } from "$lib/types";
 export default defineBackground({
   main() {
     const STORAGE_KEY = "excalivault_drawings";
+    const DRAWING_TO_INJECT_KEY = "excalivault_drawing_to_inject";
 
     async function getDrawings(): Promise<unknown[]> {
       const result = (await browser.storage.local.get(STORAGE_KEY)) as Record<
@@ -124,6 +125,26 @@ export default defineBackground({
                 error: "Failed to get drawing data. Are you on excalidraw.com?",
               };
             }
+          });
+        }
+
+        if (message.type === MessageType.OPEN_DRAWING) {
+          const payload = message.payload as {
+            id: string;
+            name: string;
+            elements: string;
+            appState: string;
+            versionFiles: string;
+            versionDataState: string;
+          };
+
+          return browser.storage.local.set({
+            [DRAWING_TO_INJECT_KEY]: payload,
+          }).then(async () => {
+            const tab = await browser.tabs.create({
+              url: "https://excalidraw.com/",
+            });
+            return { success: true };
           });
         }
 
