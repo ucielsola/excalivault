@@ -59,7 +59,7 @@
   </div>
 
   <Dialog {open}>
-    <DialogContent class="max-w-[300px]">
+    <DialogContent class="max-w-75">
       <DialogHeader>
         <div class="flex items-center gap-2.5">
           <div

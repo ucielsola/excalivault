@@ -16,12 +16,10 @@
   export let onOpen: () => void;
   export let onDelete: () => void;
   export let onDropdownMenuChange: (open: boolean) => void;
-  export let onMouseLeave: () => void;
 </script>
 
 <div
   class="group border-border/50 hover:bg-secondary/50 relative border-b transition-colors"
-  onmouseleave={onMouseLeave}
   onkeydown={(e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -82,34 +80,24 @@
       </div>
     </button>
 
-    <button
-      class="flex items-center justify-center px-3"
-      onclick={() => {
-        menuOpenId = drawing.id;
-      }}
+    <DropdownMenu
+      open={menuOpenId === drawing.id}
+      onOpenChange={onDropdownMenuChange}
     >
-      <DropdownMenu
-        open={menuOpenId === drawing.id}
-        onOpenChange={onDropdownMenuChange}
+      <DropdownMenuTrigger
+        class="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-full items-center justify-center px-3 transition-colors data-[state=open]:bg-secondary"
       >
-        <DropdownMenuTrigger>
-          <button
-            class="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-7 w-7 items-center justify-center rounded-md transition-colors"
-            type="button"
-          >
-            <EllipsisVertical size={13} />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent class="min-w-[140px]">
-          <DropdownMenuItem
-            onclick={onDelete}
-            class="text-destructive focus:text-destructive"
-          >
-            <Trash2Icon size={12} class="mr-2" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </button>
+        <EllipsisVertical size={13} />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent class="min-w-[140px]">
+        <DropdownMenuItem
+          onclick={onDelete}
+          class="text-destructive focus:text-destructive"
+        >
+          <Trash2Icon size={12} class="mr-2" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   </div>
 </div>

@@ -43,6 +43,20 @@ class DrawingService {
       payload: { id },
     });
   }
+
+  public async openDrawing(drawing: DrawingData): Promise<void> {
+    await this.sendMessage<void>({
+      type: MessageType.OPEN_DRAWING,
+      payload: {
+        id: drawing.id,
+        name: drawing.name,
+        elements: drawing.elements,
+        appState: drawing.appState,
+        versionFiles: drawing.versionFiles,
+        versionDataState: drawing.versionDataState,
+      },
+    });
+  }
 }
 
 export const drawingService = new DrawingService();

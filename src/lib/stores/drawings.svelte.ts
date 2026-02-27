@@ -10,6 +10,7 @@ class DrawingsStore {
   #loading = $state<boolean>(false);
   #error = $state<string | null>(null);
   #list = $state<DrawingData[]>([]);
+  #search = $state<string>("");
 
   public async loadDrawings(): Promise<void> {
     this.#loading = true;
@@ -74,8 +75,32 @@ class DrawingsStore {
     }
   }
 
+  public async openDrawing(drawing: DrawingData): Promise<void> {
+    try {
+      await drawingService.openDrawing(drawing);
+    } catch (e) {
+      this.#error = "Failed to open drawing";
+      captureException(e as Error);
+      throw e;
+    }
+  }
+
   get list(): DrawingData[] {
     return this.#list;
+  }
+
+  get search(): string {
+    return this.#search;
+  }
+
+  set search(value: string) {
+    this.#search = value;
+  }
+
+  get filteredList(): DrawingData[] {
+    const query = this.#search.toLowerCase();
+    if (!query) return this.#list;
+    return this.#list.filter((d) => d.name.toLowerCase().includes(query));
   }
 }
 
