@@ -150,6 +150,39 @@ export default defineBackground({
                       id = `drawing:${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
                     }
 
+                    let imageBase64: string | undefined;
+
+                    try {
+                      const canvas = document.querySelector(
+                        'canvas.excalidraw__canvas',
+                      ) as HTMLCanvasElement;
+
+                      if (canvas) {
+                        const tempCanvas = document.createElement("canvas");
+                        tempCanvas.width = 80;
+                        tempCanvas.height = 80;
+                        const tempCtx = tempCanvas.getContext("2d");
+
+                        if (tempCtx) {
+                          const scale = Math.max(
+                            80 / canvas.width,
+                            80 / canvas.height,
+                          );
+                          const scaledWidth = canvas.width * scale;
+                          const scaledHeight = canvas.height * scale;
+                          const offsetX = (80 - scaledWidth) / 2;
+                          const offsetY = (80 - scaledHeight) / 2;
+
+                          tempCtx.fillStyle = "#ffffff";
+                          tempCtx.fillRect(0, 0, 80, 80);
+                          tempCtx.drawImage(canvas, offsetX, offsetY, scaledWidth, scaledHeight);
+                          imageBase64 = tempCanvas.toDataURL("image/png", 0.5);
+                        }
+                      }
+                    } catch (e) {
+                      console.error("[Excalivault] Failed to capture canvas:", e);
+                    }
+
                     return {
                       id,
                       title,
@@ -158,6 +191,7 @@ export default defineBackground({
                       versionFiles: localStorage.getItem("version-files") || "",
                       versionDataState:
                         localStorage.getItem("version-dataState") || "",
+                      imageBase64,
                     };
                   },
                 });

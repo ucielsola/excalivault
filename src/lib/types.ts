@@ -87,6 +87,7 @@ export type GetDrawingDataResponse = {
   title: string | null;
   elements: string;
   appState: string;
+  imageBase64?: string;
 };
 
 export type SaveDrawingResponse = {
@@ -105,6 +106,7 @@ export type SaveDrawingData = {
   appState: string;
   versionFiles: string;
   versionDataState: string;
+  imageBase64?: string;
 };
 
 export type DrawingMessage =

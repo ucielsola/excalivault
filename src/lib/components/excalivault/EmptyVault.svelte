@@ -63,6 +63,7 @@
       appState: currentData.appState,
       versionFiles: "",
       versionDataState: "",
+      imageBase64: currentData.imageBase64,
     });
 
     saveDialogOpen = false;
