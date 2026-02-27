@@ -21,8 +21,11 @@ export default defineBackground({
   main() {
     initSentry();
     const STORAGE_KEY = "excalivault_drawings";
+    const FOLDERS_STORAGE_KEY = "excalivault_folders";
     const DRAWING_TO_INJECT_KEY = "excalivault_drawing_to_inject";
     const TARGET_URL = "https://excalidraw.com";
+
+    migrateDrawings();
 
     (browser as unknown as SidePanelBrowser).sidePanel.setPanelBehavior({
       openPanelOnActionClick: true,
@@ -51,6 +54,33 @@ export default defineBackground({
       await browser.storage.local.set({ [STORAGE_KEY]: drawings });
     }
 
+    async function getFolders(): Promise<unknown[]> {
+      const result = (await browser.storage.local.get(
+        FOLDERS_STORAGE_KEY,
+      )) as Record<string, unknown[]>;
+      return result[FOLDERS_STORAGE_KEY] || [];
+    }
+
+    async function saveFolders(folders: unknown[]): Promise<void> {
+      await browser.storage.local.set({ [FOLDERS_STORAGE_KEY]: folders });
+    }
+
+    async function migrateDrawings(): Promise<void> {
+      const drawings = await getDrawings();
+      const hasFolderId =
+        drawings.length > 0 && "folderId" in (drawings[0] as object);
+      if (hasFolderId) return;
+
+      const migratedDrawings = (drawings as Array<Record<string, unknown>>).map(
+        (d) => ({
+          ...d,
+          folderId: null,
+        }),
+      );
+      await saveDrawings(migratedDrawings);
+      await saveFolders([]);
+    }
+
     async function getActiveTab(): Promise<unknown> {
       const tabs = await browser.tabs.query({
         active: true,
@@ -72,6 +102,12 @@ export default defineBackground({
             return getDrawings().then((drawings) => ({ drawings }));
           }
 
+          if (typedMessage.type === MessageType.GET_WORKSPACE) {
+            return Promise.all([getDrawings(), getFolders()]).then(
+              ([drawings, folders]) => ({ folders, drawings }),
+            );
+          }
+
           if (typedMessage.type === MessageType.SAVE_DRAWING) {
             const payload = typedMessage.payload as {
               id: string;
@@ -82,6 +118,7 @@ export default defineBackground({
               versionDataState: string;
               imageBase64?: string;
               viewBackgroundColor?: string;
+              folderId?: string | null;
             };
 
             return getDrawings().then(async (drawings: unknown[]) => {
@@ -92,6 +129,7 @@ export default defineBackground({
 
               const drawing = {
                 id: payload.id,
+                folderId: payload.folderId ?? null,
                 name: payload.name,
                 elements: payload.elements,
                 appState: payload.appState,
@@ -130,6 +168,99 @@ export default defineBackground({
             });
           }
 
+          if (typedMessage.type === MessageType.CREATE_FOLDER) {
+            const payload = typedMessage.payload as {
+              name: string;
+              parentId?: string | null;
+            };
+
+            return getFolders().then(async (folders: unknown[]) => {
+              const now = Date.now();
+              const folder = {
+                id: `folder:${now}-${Math.random().toString(36).substr(2, 9)}`,
+                name: payload.name,
+                parentId: payload.parentId ?? null,
+                createdAt: now,
+                updatedAt: now,
+              };
+              folders.push(folder);
+              await saveFolders(folders);
+              return { success: true, folders };
+            });
+          }
+
+          if (typedMessage.type === MessageType.UPDATE_FOLDER) {
+            const payload = typedMessage.payload as {
+              id: string;
+              name: string;
+            };
+
+            return getFolders().then(async (folders: unknown[]) => {
+              const index = (folders as { id: string }[]).findIndex(
+                (f) => f.id === payload.id,
+              );
+              if (index < 0) {
+                return { success: false, folders };
+              }
+              (folders as Array<Record<string, unknown>>)[index] = {
+                ...(folders[index] as object),
+                name: payload.name,
+                updatedAt: Date.now(),
+              };
+              await saveFolders(folders);
+              return { success: true, folders };
+            });
+          }
+
+          if (typedMessage.type === MessageType.DELETE_FOLDER) {
+            const payload = typedMessage.payload as { id: string };
+
+            return Promise.all([getFolders(), getDrawings()]).then(
+              async ([folders, drawings]: [unknown[], unknown[]]) => {
+                const filteredFolders = (folders as { id: string }[]).filter(
+                  (f) => f.id !== payload.id,
+                );
+
+                const filteredDrawings = (
+                  drawings as {
+                    folderId: string | null;
+                  }[]
+                ).filter((d) => d.folderId !== payload.id);
+
+                await saveFolders(filteredFolders);
+                await saveDrawings(filteredDrawings);
+                return {
+                  success: true,
+                  folders: filteredFolders,
+                  drawings: filteredDrawings,
+                };
+              },
+            );
+          }
+
+          if (typedMessage.type === MessageType.MOVE_DRAWING) {
+            const payload = typedMessage.payload as {
+              drawingId: string;
+              folderId: string | null;
+            };
+
+            return getDrawings().then(async (drawings: unknown[]) => {
+              const index = (drawings as { id: string }[]).findIndex(
+                (d) => d.id === payload.drawingId,
+              );
+              if (index < 0) {
+                return { success: false, drawings };
+              }
+              (drawings as Array<Record<string, unknown>>)[index] = {
+                ...(drawings[index] as object),
+                folderId: payload.folderId,
+                updatedAt: Date.now(),
+              };
+              await saveDrawings(drawings);
+              return { success: true, drawings };
+            });
+          }
+
           if (message.type === MessageType.GET_DRAWING_DATA) {
             return getActiveTab().then(async (tab: unknown) => {
               const tabObj = tab as { id?: number };
@@ -154,7 +285,7 @@ export default defineBackground({
 
                     try {
                       const canvas = document.querySelector(
-                        'canvas.excalidraw__canvas',
+                        "canvas.excalidraw__canvas",
                       ) as HTMLCanvasElement;
 
                       if (canvas) {
@@ -175,12 +306,21 @@ export default defineBackground({
 
                           tempCtx.fillStyle = "#ffffff";
                           tempCtx.fillRect(0, 0, 80, 80);
-                          tempCtx.drawImage(canvas, offsetX, offsetY, scaledWidth, scaledHeight);
+                          tempCtx.drawImage(
+                            canvas,
+                            offsetX,
+                            offsetY,
+                            scaledWidth,
+                            scaledHeight,
+                          );
                           imageBase64 = tempCanvas.toDataURL("image/png", 0.5);
                         }
                       }
                     } catch (e) {
-                      console.error("[Excalivault] Failed to capture canvas:", e);
+                      console.error(
+                        "[Excalivault] Failed to capture canvas:",
+                        e,
+                      );
                     }
 
                     return {

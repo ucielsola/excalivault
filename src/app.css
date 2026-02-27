@@ -89,4 +89,50 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Folder color utility classes */
+  .folder-color-amber {
+    color: oklch(0.78 0.16 65);
+    background-color: color-mix(in oklch, oklch(0.78 0.16 65) 12%, transparent);
+  }
+  .folder-color-mint {
+    color: oklch(0.65 0.18 170);
+    background-color: color-mix(
+      in oklch,
+      oklch(0.65 0.18 170) 12%,
+      transparent
+    );
+  }
+  .folder-color-rose {
+    color: oklch(0.7 0.16 330);
+    background-color: color-mix(in oklch, oklch(0.7 0.16 330) 12%, transparent);
+  }
+  .folder-color-sky {
+    color: oklch(0.65 0.17 250);
+    background-color: color-mix(
+      in oklch,
+      oklch(0.65 0.17 250) 12%,
+      transparent
+    );
+  }
+  .folder-color-leaf {
+    color: oklch(0.72 0.16 140);
+    background-color: color-mix(
+      in oklch,
+      oklch(0.72 0.16 140) 12%,
+      transparent
+    );
+  }
+  .folder-color-coral {
+    color: oklch(0.68 0.15 30);
+    background-color: color-mix(in oklch, oklch(0.68 0.15 30) 12%, transparent);
+  }
+  .folder-color-indigo {
+    color: oklch(0.74 0.14 280);
+    background-color: color-mix(
+      in oklch,
+      oklch(0.74 0.14 280) 12%,
+      transparent
+    );
+  }
 }
