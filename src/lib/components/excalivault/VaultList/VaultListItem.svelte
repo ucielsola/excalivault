@@ -1,6 +1,7 @@
 <script lang="ts">
   import { EllipsisVertical, FileText, Pencil, Trash2 } from "@lucide/svelte";
 
+  import InlineInput from "$lib/components/excalivault/InlineInput.svelte";
   import {
     DropdownMenu,
     DropdownMenuContent,
@@ -10,8 +11,6 @@
   } from "$lib/components/ui/dropdown-menu";
   import { type DrawingData, type FolderData } from "$lib/types";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
-
-  import InlineInput from "./InlineInput.svelte";
 
   interface Props {
     drawing: DrawingData;
