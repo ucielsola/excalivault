@@ -57,22 +57,47 @@ class FoldersStore {
     }
   }
 
-  public async updateFolder(id: string, name: string): Promise<void> {
+  public async updateFolder(id: string, name: string, color?: string): Promise<void> {
     const folder = this.#folders.find((f) => f.id === id);
     if (!folder) return;
 
     const originalName = folder.name;
+    const originalColor = folder.color;
     folder.name = name;
+    if (color) folder.color = color;
     this.#folders = [...this.#folders];
     this.#error = null;
 
     try {
-      const response = await folderService.updateFolder(id, name);
+      const response = await folderService.updateFolder(id, name, color);
       this.#folders = response.folders;
     } catch (e) {
       folder.name = originalName;
+      folder.color = originalColor;
       this.#folders = [...this.#folders];
       this.#error = "Failed to update folder";
+      captureException(e as Error);
+    }
+  }
+
+  public async updateFolderColor(id: string, color: string): Promise<void> {
+    const folder = this.#folders.find((f) => f.id === id);
+    if (!folder) {
+      return;
+    }
+
+    const originalColor = folder.color;
+    folder.color = color;
+    this.#folders = [...this.#folders];
+    this.#error = null;
+
+    try {
+      const response = await folderService.updateFolder(id, folder.name, color);
+      this.#folders = response.folders;
+    } catch (e) {
+      folder.color = originalColor;
+      this.#folders = [...this.#folders];
+      this.#error = "Failed to update folder color";
       captureException(e as Error);
     }
   }
@@ -173,6 +198,29 @@ class FoldersStore {
         : undefined;
     }
     return path;
+  }
+
+  getDescendantCount(folderId: string): { folders: number; drawings: number } {
+    const descendantFolderIds: string[] = [];
+    const queue = [folderId];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      const children = this.#folders.filter((f) => f.parentId === currentId);
+      for (const child of children) {
+        descendantFolderIds.push(child.id);
+        queue.push(child.id);
+      }
+    }
+
+    const descendantDrawings = drawings.list.filter((d) =>
+      d.folderId ? descendantFolderIds.includes(d.folderId) : false,
+    ).length;
+
+    return {
+      folders: descendantFolderIds.length,
+      drawings: descendantDrawings,
+    };
   }
 }
 

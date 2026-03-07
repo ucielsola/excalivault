@@ -12,6 +12,7 @@ class VaultListStore {
   #confirmOpenOpen = $state(false);
   #deleteConfirmOpen = $state(false);
   #creatingFolder = $state(false);
+  #creatingSubfolderId = $state<string | null>(null);
   #renamingId = $state<string | null>(null);
   #moveTarget = $state<string | null>(null);
   #savePanelOpen = $state(false);
@@ -21,6 +22,8 @@ class VaultListStore {
   #savingState = $state<SavingState>("idle");
   #search = $state("");
   #newCopyInputRef = $state<HTMLInputElement | undefined>(undefined);
+  #deletingFolderSubfolderCount = $state(0);
+  #deletingFolderDrawingCount = $state(0);
 
   get menuOpenId(): string | null {
     return this.#menuOpenId;
@@ -76,6 +79,14 @@ class VaultListStore {
 
   set creatingFolder(value: boolean) {
     this.#creatingFolder = value;
+  }
+
+  get creatingSubfolderId(): string | null {
+    return this.#creatingSubfolderId;
+  }
+
+  set creatingSubfolderId(value: string | null) {
+    this.#creatingSubfolderId = value;
   }
 
   get renamingId(): string | null {
@@ -148,6 +159,14 @@ class VaultListStore {
 
   set newCopyInputRef(value: HTMLInputElement | undefined) {
     this.#newCopyInputRef = value;
+  }
+
+  get deletingFolderSubfolderCount(): number {
+    return this.#deletingFolderSubfolderCount;
+  }
+
+  get deletingFolderDrawingCount(): number {
+    return this.#deletingFolderDrawingCount;
   }
 
   get isSearching(): boolean {
@@ -266,9 +285,14 @@ class VaultListStore {
     this.#currentFolderId = null;
   }
 
-  async handleCreateFolder(name: string): Promise<void> {
-    await folders.createFolder(name, null);
+  async handleCreateFolder(name: string, color?: string): Promise<void> {
+    await folders.createFolder(name, null, color);
     this.#creatingFolder = false;
+  }
+
+  async handleCreateSubFolder(parentId: string, name: string, color?: string): Promise<void> {
+    await folders.createFolder(name, parentId, color);
+    this.#creatingSubfolderId = null;
   }
 
   async handleRenameFolder(id: string, newName: string): Promise<void> {
@@ -276,9 +300,17 @@ class VaultListStore {
     this.#renamingId = null;
   }
 
+  async handleChangeFolderColor(id: string, color: string): Promise<void> {
+    await folders.updateFolderColor(id, color);
+    this.#menuOpenId = null;
+  }
+
   async handleDeleteFolder(id: string): Promise<void> {
     const folder = folders.folders.find((f) => f.id === id);
     if (!folder) return;
+    const counts = folders.getDescendantCount(id);
+    this.#deletingFolderSubfolderCount = counts.folders;
+    this.#deletingFolderDrawingCount = counts.drawings;
     this.#selectedFolder = folder;
     this.#deleteConfirmOpen = true;
   }

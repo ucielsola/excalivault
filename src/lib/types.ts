@@ -196,6 +196,8 @@ export type DeleteFolderResponse = {
   success: boolean;
   folders: FolderData[];
   drawings: DrawingData[];
+  deletedSubfolderCount?: number;
+  deletedDrawingCount?: number;
 };
 
 export type MoveDrawingResponse = {

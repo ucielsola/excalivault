@@ -1,25 +1,19 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { FolderOpen, Plus, Replace, Save } from "@lucide/svelte";
+  import { Plus, Replace, Save } from "@lucide/svelte";
 
   import DeleteConfirmDialog from "$lib/components/excalivault/DeleteConfirmDialog.svelte";
-  import InlineInput from "$lib/components/excalivault/InlineInput.svelte";
+  import FolderCreation from "$lib/components/excalivault/FolderCreation.svelte";
   import OverwriteConfirmDialog from "$lib/components/excalivault/OverwriteConfirmDialog.svelte";
   import * as VaultList from "$lib/components/excalivault/VaultList";
   import WelcomeScreen from "$lib/components/excalivault/WelcomeScreen.svelte";
   import { drawings, folders, vaultList } from "$lib/stores";
-  import { COLOR_VALUES, getFolderBadgeClass } from "$lib/utils/folderColors";
 
   let listRef = $state<HTMLDivElement | null>(null);
 
-  let isEmptyVault = $derived(drawings.list.length === 0 && folders.folders.length === 0);
-
-  let creatingFolder = $derived(vaultList.creatingFolder);
-  let savePanelOpen = $derived(vaultList.savePanelOpen);
-  let selectedDrawing = $derived(vaultList.selectedDrawing);
-  let selectedFolder = $derived(vaultList.selectedFolder);
-  let confirmOpenOpen = $derived(vaultList.confirmOpenOpen);
-  let deleteConfirmOpen = $derived(vaultList.deleteConfirmOpen);
+  let isEmptyVault = $derived(
+    drawings.list.length === 0 && folders.folders.length === 0,
+  );
 
   onMount(async () => {
     drawings.loadDrawings();
@@ -52,23 +46,12 @@
     <VaultList.SearchBar />
 
     <div class="flex-1 overflow-y-auto">
-      {#if creatingFolder}
+      {#if vaultList.creatingFolder}
         <div class="border-border/50 border-b px-4 py-2.5">
-          <div class="flex items-center gap-2">
-            <FolderOpen
-              size={14}
-              class={getFolderBadgeClass(
-                COLOR_VALUES[folders.folders.length % COLOR_VALUES.length],
-              )}
-            />
-            <div class="flex-1">
-              <InlineInput
-                placeholder="Folder name..."
-                onConfirm={(name: string) => vaultList.handleCreateFolder(name)}
-                onCancel={() => (vaultList.creatingFolder = false)}
-              />
-            </div>
-          </div>
+          <FolderCreation
+            onConfirm={(name, color) => vaultList.handleCreateFolder(name, color)}
+            onCancel={() => (vaultList.creatingFolder = false)}
+          />
         </div>
       {/if}
 
@@ -78,7 +61,7 @@
       <VaultList.EmptyState type="search" />
     </div>
 
-    {#if savePanelOpen}
+    {#if vaultList.savePanelOpen}
       <VaultList.SavePanel />
     {:else}
       <div class="border-border border-t">
@@ -115,26 +98,30 @@
       </div>
     {/if}
 
-    {#if confirmOpenOpen && selectedDrawing}
+    {#if vaultList.confirmOpenOpen && vaultList.selectedDrawing}
       <OverwriteConfirmDialog
-        open={confirmOpenOpen}
-        drawingName={selectedDrawing.name}
+        open={vaultList.confirmOpenOpen}
+        drawingName={vaultList.selectedDrawing.name}
         onConfirm={() => vaultList.confirmOpen()}
         onCancel={() => vaultList.cancelOpen()}
       />
     {/if}
 
-    {#if deleteConfirmOpen && (selectedDrawing || selectedFolder)}
+    {#if vaultList.deleteConfirmOpen && (vaultList.selectedDrawing || vaultList.selectedFolder)}
       <DeleteConfirmDialog
-        open={deleteConfirmOpen}
-        itemName={selectedDrawing?.name ?? selectedFolder?.name ?? ""}
-        itemType={selectedDrawing ? "drawing" : "folder"}
+        open={vaultList.deleteConfirmOpen}
+        itemName={vaultList.selectedDrawing?.name ??
+          vaultList.selectedFolder?.name ??
+          ""}
+        itemType={vaultList.selectedDrawing ? "drawing" : "folder"}
+        subfolderCount={vaultList.deletingFolderSubfolderCount}
+        subfolderDrawingCount={vaultList.deletingFolderDrawingCount}
         onConfirm={() =>
-          selectedDrawing
+          vaultList.selectedDrawing
             ? vaultList.confirmDelete()
             : vaultList.confirmDeleteFolder()}
         onCancel={() =>
-          selectedDrawing
+          vaultList.selectedDrawing
             ? vaultList.cancelDelete()
             : vaultList.cancelDeleteFolder()}
       />

@@ -62,7 +62,7 @@
     onStartMove={() => {
       vaultList.moveTarget = drawing.id;
     }}
-    onMove={vaultList.confirmMoveDrawing}
-    onCancelMove={vaultList.cancelMoveDrawing}
+    onMove={(folderId: string | null) => vaultList.confirmMoveDrawing(folderId)}
+    onCancelMove={() => vaultList.cancelMoveDrawing()}
   />
 {/each}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Trash2Icon from "@lucide/svelte/icons/trash-2";
+  import { AlertTriangle, Trash2Icon } from "@lucide/svelte";
 
   import { Button } from "$lib/components/ui/button";
   import {
@@ -17,12 +17,16 @@
     open = false,
     itemName = "",
     itemType = "drawing",
+    subfolderCount = 0,
+    subfolderDrawingCount = 0,
     onConfirm = () => {},
     onCancel = () => {},
   }: {
     open: boolean;
     itemName: string;
     itemType?: "drawing" | "folder";
+    subfolderCount?: number;
+    subfolderDrawingCount?: number;
     onConfirm: () => void;
     onCancel: () => void;
   } = $props();
@@ -37,6 +41,8 @@
   function handleReset() {
     phase = "confirm";
   }
+
+  let hasSubfolders = $derived(itemType === "folder" && (subfolderCount > 0 || subfolderDrawingCount > 0));
 </script>
 
 <div class="flex h-full flex-col">
@@ -67,6 +73,21 @@
               <span class="text-foreground font-medium">"{itemName}"</span>
               ? This action cannot be undone.
             </DialogDescription>
+            {#if hasSubfolders}
+              <div class="bg-destructive/5 border-destructive/20 flex items-start gap-2 rounded-md border p-3">
+                <AlertTriangle size={14} class="text-destructive shrink-0 mt-0.5" />
+                <div class="space-y-1">
+                  <p class="text-destructive text-[11px] font-medium">
+                    This will also delete:
+                  </p>
+                  <p class="text-muted-foreground text-[11px]">
+                    {subfolderCount > 0 && `${subfolderCount} subfolder${subfolderCount > 1 ? "s" : ""}`}
+                    {subfolderCount > 0 && subfolderDrawingCount > 0 && " and "}
+                    {subfolderDrawingCount > 0 && `${subfolderDrawingCount} drawing${subfolderDrawingCount > 1 ? "s" : ""}`}
+                  </p>
+                </div>
+              </div>
+            {/if}
           </div>
 
           <DialogFooter>

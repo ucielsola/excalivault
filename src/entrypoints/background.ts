@@ -26,6 +26,7 @@ export default defineBackground({
     const TARGET_URL = "https://excalidraw.com";
 
     migrateDrawings();
+    migrateFolders();
 
     (browser as unknown as SidePanelBrowser).sidePanel.setPanelBehavior({
       openPanelOnActionClick: true,
@@ -79,6 +80,22 @@ export default defineBackground({
       );
       await saveDrawings(migratedDrawings);
       await saveFolders([]);
+    }
+
+    async function migrateFolders(): Promise<void> {
+      const folders = await getFolders() as Array<Record<string, unknown>>;
+      if (folders.length === 0) return;
+
+      const needsMigration = folders.some((f) => !("color" in f));
+      if (!needsMigration) return;
+
+      const migratedFolders = folders.map(
+        (f) => ({
+          ...f,
+          color: ("color" in f ? f.color : undefined),
+        }),
+      );
+      await saveFolders(migratedFolders);
     }
 
     async function getActiveTab(): Promise<unknown> {
@@ -172,6 +189,7 @@ export default defineBackground({
             const payload = typedMessage.payload as {
               name: string;
               parentId?: string | null;
+              color?: string;
             };
 
             return getFolders().then(async (folders: unknown[]) => {
@@ -180,6 +198,7 @@ export default defineBackground({
                 id: `folder:${now}-${Math.random().toString(36).substr(2, 9)}`,
                 name: payload.name,
                 parentId: payload.parentId ?? null,
+                color: payload.color,
                 createdAt: now,
                 updatedAt: now,
               };
@@ -193,6 +212,7 @@ export default defineBackground({
             const payload = typedMessage.payload as {
               id: string;
               name: string;
+              color?: string;
             };
 
             return getFolders().then(async (folders: unknown[]) => {
@@ -202,10 +222,16 @@ export default defineBackground({
               if (index < 0) {
                 return { success: false, folders };
               }
-              (folders as Array<Record<string, unknown>>)[index] = {
-                ...(folders[index] as object),
+              const updates: Record<string, unknown> = {
                 name: payload.name,
                 updatedAt: Date.now(),
+              };
+              if (payload.color !== undefined) {
+                updates.color = payload.color;
+              }
+              (folders as Array<Record<string, unknown>>)[index] = {
+                ...(folders[index] as object),
+                ...updates,
               };
               await saveFolders(folders);
               return { success: true, folders };
@@ -217,15 +243,26 @@ export default defineBackground({
 
             return Promise.all([getFolders(), getDrawings()]).then(
               async ([folders, drawings]: [unknown[], unknown[]]) => {
-                const filteredFolders = (folders as { id: string }[]).filter(
-                  (f) => f.id !== payload.id,
+                const typedFolders = folders as { id: string; parentId: string | null }[];
+                const typedDrawings = drawings as { folderId: string | null }[];
+
+                function getAllDescendantFolderIds(folderId: string): string[] {
+                  const ids = [folderId];
+                  const children = typedFolders.filter((f) => f.parentId === folderId);
+                  for (const child of children) {
+                    ids.push(...getAllDescendantFolderIds(child.id));
+                  }
+                  return ids;
+                }
+
+                const descendantFolderIds = getAllDescendantFolderIds(payload.id);
+                const filteredFolders = typedFolders.filter(
+                  (f) => !descendantFolderIds.includes(f.id),
                 );
 
-                const filteredDrawings = (
-                  drawings as {
-                    folderId: string | null;
-                  }[]
-                ).filter((d) => d.folderId !== payload.id);
+                const filteredDrawings = typedDrawings.filter(
+                  (d) => d.folderId === null || !descendantFolderIds.includes(d.folderId),
+                );
 
                 await saveFolders(filteredFolders);
                 await saveDrawings(filteredDrawings);
@@ -233,6 +270,8 @@ export default defineBackground({
                   success: true,
                   folders: filteredFolders,
                   drawings: filteredDrawings,
+                  deletedSubfolderCount: descendantFolderIds.length - 1,
+                  deletedDrawingCount: typedDrawings.length - filteredDrawings.length,
                 };
               },
             );

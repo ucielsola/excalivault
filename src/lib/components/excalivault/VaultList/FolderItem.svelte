@@ -4,10 +4,13 @@
     ChevronRight,
     EllipsisVertical,
     FolderOpen,
+    FolderPlus,
+    Palette,
     Pencil,
     Trash2,
   } from "@lucide/svelte";
 
+  import FolderCreation from "$lib/components/excalivault/FolderCreation.svelte";
   import InlineInput from "$lib/components/excalivault/InlineInput.svelte";
   import * as VaultList from "$lib/components/excalivault/VaultList";
   import {
@@ -15,27 +18,35 @@
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
   } from "$lib/components/ui/dropdown-menu";
   import { folders, vaultList } from "$lib/stores";
   import { type FolderData } from "$lib/types";
-  import { getFolderBadgeClass } from "$lib/utils/folderColors";
+  import { FOLDER_COLORS, getFolderBadgeClass } from "$lib/utils/folderColors";
+  import FolderItem from "./FolderItem.svelte";
 
   interface Props {
     folder: FolderData;
-    indent?: boolean;
+    level?: number;
   }
 
-  let { folder, indent = false }: Props = $props();
+  let { folder, level = 0 }: Props = $props();
 
   let isExpanded = $derived(vaultList.expandedFolders.has(folder.id));
   let isRenaming = $derived(vaultList.renamingId === folder.id);
   let folderDrawings = $derived(vaultList.drawingsInFolder(folder.id));
+  let childFolders = $derived(folders.getFolderChildren(folder.id));
+  let isCreatingSubfolder = $derived(vaultList.creatingSubfolderId === folder.id);
+  let folderBadgeClass = $derived(getFolderBadgeClass(folder.color));
 </script>
 
 <div>
   <div
     class="group border-border/50 hover:bg-secondary/50 relative border-b transition-colors"
+    style="padding-left: {level * 20}px;"
   >
     <div class="flex items-center gap-2 px-4 py-2.5">
       <button
@@ -51,7 +62,7 @@
 
       <FolderOpen
         size={14}
-        class={getFolderBadgeClass(folder.color) + " shrink-0"}
+        class={folderBadgeClass + " shrink-0"}
       />
 
       <div class="min-w-0 flex-1">
@@ -87,11 +98,34 @@
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent class="w-48" align="end">
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <Palette size={11} />
+                Change colour
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                {#each Object.entries(FOLDER_COLORS) as [name, colorValue]}
+                  <DropdownMenuItem
+                    class="flex items-center gap-2"
+                    onclick={() => vaultList.handleChangeFolderColor(folder.id, colorValue)}
+                  >
+                    <div
+                      class="h-3 w-3 rounded-full"
+                      style="background-color: {colorValue}"
+                    ></div>
+                    <span class="capitalize">{name}</span>
+                  </DropdownMenuItem>
+                {/each}
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
             <DropdownMenuItem
-              onclick={() => vaultList.handleSelectFolder(folder.id)}
+              onclick={() => {
+                folders.toggleFolder(folder.id);
+                vaultList.creatingSubfolderId = folder.id;
+              }}
             >
-              <FolderOpen size={11} />
-              Open folder
+              <FolderPlus size={11} />
+              New subfolder
             </DropdownMenuItem>
             <DropdownMenuItem
               onclick={() => (vaultList.renamingId = folder.id)}
@@ -113,32 +147,56 @@
     </div>
   </div>
 
-  {#if isExpanded && folderDrawings.length > 0}
-    <div class="border-border/30 bg-secondary/20 border-b">
-      {#each folderDrawings as drawing (drawing.id)}
-        <VaultList.VaultListItem
-          {drawing}
-          indent={true}
-          isRenaming={vaultList.renamingId === drawing.id}
-          moveTarget={vaultList.moveTarget}
-          folders={folders.folders}
-          formatDate={vaultList.formatDate}
-          onOpen={() => vaultList.handleOpen(drawing)}
-          onDelete={() => vaultList.handleDelete(drawing.id)}
-          onRename={(name: string) =>
-            vaultList.handleRenameDrawing(drawing.id, name)}
-          onStartRename={() => {
-            vaultList.renamingId = drawing.id;
-          }}
-          onCancelRename={() => (vaultList.renamingId = null)}
-          onDuplicate={() => vaultList.handleDuplicateDrawing(drawing.id)}
-          onStartMove={() => {
-            vaultList.moveTarget = drawing.id;
-          }}
-          onMove={vaultList.confirmMoveDrawing}
-          onCancelMove={vaultList.cancelMoveDrawing}
-        />
+  {#if isExpanded}
+    {#if folderDrawings.length > 0}
+      <div class="border-border/30 bg-secondary/20 border-b">
+        {#each folderDrawings as drawing (drawing.id)}
+          <VaultList.VaultListItem
+            {drawing}
+            indent={true}
+            isRenaming={vaultList.renamingId === drawing.id}
+            moveTarget={vaultList.moveTarget}
+            folders={folders.folders}
+            formatDate={vaultList.formatDate}
+            onOpen={() => vaultList.handleOpen(drawing)}
+            onDelete={() => vaultList.handleDelete(drawing.id)}
+            onRename={(name: string) =>
+              vaultList.handleRenameDrawing(drawing.id, name)}
+            onStartRename={() => {
+              vaultList.renamingId = drawing.id;
+            }}
+            onCancelRename={() => (vaultList.renamingId = null)}
+            onDuplicate={() => vaultList.handleDuplicateDrawing(drawing.id)}
+            onStartMove={() => {
+              vaultList.moveTarget = drawing.id;
+            }}
+            onMove={(folderId: string | null) => vaultList.confirmMoveDrawing(folderId)}
+            onCancelMove={() => vaultList.cancelMoveDrawing()}
+          />
+        {/each}
+      </div>
+    {/if}
+
+    {#if childFolders.length > 0}
+      {#each childFolders as childFolder (childFolder.id)}
+        <FolderItem folder={childFolder} level={level + 1} />
       {/each}
+    {/if}
+  {/if}
+
+  {#if isCreatingSubfolder}
+    <div class="border-border/50 bg-secondary/10 border-b" style="padding-left: {level * 20}px;">
+      <div class="flex items-center gap-2 px-4 py-2.5">
+        <div class="h-5 w-5 shrink-0"></div>
+        <FolderCreation
+          onConfirm={(name, color) => {
+            vaultList.handleCreateSubFolder(folder.id, name, color);
+          }}
+          onCancel={() => {
+            vaultList.creatingSubfolderId = null;
+          }}
+        />
+      </div>
     </div>
   {/if}
 </div>
