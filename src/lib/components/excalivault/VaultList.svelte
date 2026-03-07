@@ -1,18 +1,18 @@
 <script lang="ts">
   import {
-    AlertTriangle,
     ChevronDown,
     ChevronLeft,
     ChevronRight,
+    EllipsisVertical,
     FolderOpen,
     FolderPlus,
-    MoreVertical,
     Pencil,
     Plus,
     Replace,
     Save,
     Search,
     Trash2,
+    TriangleAlert,
     X,
   } from "@lucide/svelte";
 
@@ -432,7 +432,7 @@
                     }}
                     class="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-6 w-6 items-center justify-center rounded"
                   >
-                    <MoreVertical size={12} />
+                    <EllipsisVertical size={12} />
                   </button>
                 </div>
               {/if}
@@ -487,24 +487,18 @@
                   {drawing}
                   indent={true}
                   isRenaming={renamingId === drawing.id}
-                  menuOpen={menuOpenId === drawing.id}
                   moveTarget={moveTarget === drawing.id}
                   folders={folders.folders}
                   {formatDate}
                   onOpen={() => handleOpen(drawing)}
                   onDelete={() => handleDelete(drawing.id)}
-                  onMenuToggle={() =>
-                    (menuOpenId =
-                      menuOpenId === drawing.id ? null : drawing.id)}
                   onRename={(name) => handleRenameDrawing(drawing.id, name)}
                   onStartRename={() => {
-                    menuOpenId = null;
                     renamingId = drawing.id;
                   }}
                   onCancelRename={() => (renamingId = null)}
                   onDuplicate={() => handleDuplicateDrawing(drawing.id)}
                   onStartMove={() => {
-                    menuOpenId = null;
                     moveTarget = drawing.id;
                   }}
                   onMove={confirmMoveDrawing}
@@ -542,7 +536,6 @@
         {drawing}
         indent={false}
         isRenaming={renamingId === drawing.id}
-        menuOpen={menuOpenId === drawing.id}
         moveTarget={moveTarget === drawing.id}
         folders={folders.folders}
         {formatDate}
@@ -555,17 +548,13 @@
           : undefined}
         onOpen={() => handleOpen(drawing)}
         onDelete={() => handleDelete(drawing.id)}
-        onMenuToggle={() =>
-          (menuOpenId = menuOpenId === drawing.id ? null : drawing.id)}
         onRename={(name) => handleRenameDrawing(drawing.id, name)}
         onStartRename={() => {
-          menuOpenId = null;
           renamingId = drawing.id;
         }}
         onCancelRename={() => (renamingId = null)}
         onDuplicate={() => handleDuplicateDrawing(drawing.id)}
         onStartMove={() => {
-          menuOpenId = null;
           moveTarget = drawing.id;
         }}
         onMove={confirmMoveDrawing}
@@ -655,7 +644,7 @@
             <div
               class="border-primary/20 bg-primary/5 flex items-start gap-2 rounded-md border px-2.5 py-1.5"
             >
-              <AlertTriangle size={11} class="text-primary mt-0.5 shrink-0" />
+              <TriangleAlert size={11} class="text-primary mt-0.5 shrink-0" />
               <p class="text-muted-foreground text-[10px] leading-relaxed">
                 Select a drawing to <span class="text-foreground font-medium"
                   >replace</span

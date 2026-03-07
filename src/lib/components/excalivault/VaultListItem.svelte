@@ -13,6 +13,13 @@
 
   import { type DrawingData, type FolderData } from "$lib/types";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
+  import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "$lib/components/ui/dropdown-menu";
 
   import InlineInput from "./InlineInput.svelte";
 
@@ -20,16 +27,14 @@
     drawing: DrawingData;
     indent?: boolean;
     isRenaming: boolean;
-    menuOpen: boolean;
     moveTarget: boolean;
     folders: FolderData[];
     showFolderBadge?: boolean;
     folderName?: string;
     folderColor?: string;
     formatDate: (timestamp: number) => string;
-    _onOpen: () => void;
+    onOpen: () => void;
     onDelete: () => void;
-    onMenuToggle: () => void;
     onRename: (name: string) => void;
     onStartRename: () => void;
     onCancelRename: () => void;
@@ -43,16 +48,14 @@
     drawing,
     indent = false,
     isRenaming,
-    menuOpen,
     moveTarget,
     folders,
     showFolderBadge,
     folderName,
     folderColor,
     formatDate,
-    _onOpen,
+    onOpen,
     onDelete,
-    onMenuToggle,
     onRename,
     onStartRename,
     onCancelRename,
@@ -125,22 +128,38 @@
     </div>
 
     {#if !isRenaming}
-      <div
-        class="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100"
-      >
-        <button
-          class="text-muted-foreground hover:bg-primary/10 hover:text-primary flex h-6 w-6 items-center justify-center rounded"
-          title="Open in new tab"
-        >
-          <ExternalLink size={12} />
-        </button>
-        <button
-          onclick={onMenuToggle}
-          class="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-6 w-6 items-center justify-center rounded"
-        >
-          <MoreVertical size={12} />
-        </button>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <button
+            class="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-6 w-6 items-center justify-center rounded"
+          >
+            <MoreVertical size={12} />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent class="w-48" align="end">
+          <DropdownMenuItem>
+            <ExternalLink size={11} />
+            Open in tab
+          </DropdownMenuItem>
+          <DropdownMenuItem onclick={onStartRename}>
+            <Pencil size={11} />
+            Rename
+          </DropdownMenuItem>
+          <DropdownMenuItem onclick={onDuplicate}>
+            <Copy size={11} />
+            Duplicate
+          </DropdownMenuItem>
+          <DropdownMenuItem onclick={onStartMove}>
+            <FolderInput size={11} />
+            Move to folder
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onclick={onDelete} class="text-destructive">
+            <Trash2 size={11} />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     {/if}
   </div>
 
@@ -177,48 +196,6 @@
           Cancel
         </button>
       </div>
-    </div>
-  {/if}
-
-  {#if menuOpen}
-    <div
-      class="border-border bg-card absolute top-9 right-3 z-20 min-w-[150px] rounded-md border p-1 shadow-xl"
-    >
-      <button
-        class="text-foreground hover:bg-secondary flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[11px] transition-colors"
-      >
-        <ExternalLink size={11} />
-        Open in tab
-      </button>
-      <button
-        onclick={onStartRename}
-        class="text-foreground hover:bg-secondary flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[11px] transition-colors"
-      >
-        <Pencil size={11} />
-        Rename
-      </button>
-      <button
-        onclick={onDuplicate}
-        class="text-foreground hover:bg-secondary flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[11px] transition-colors"
-      >
-        <Copy size={11} />
-        Duplicate
-      </button>
-      <button
-        onclick={onStartMove}
-        class="text-foreground hover:bg-secondary flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[11px] transition-colors"
-      >
-        <FolderInput size={11} />
-        Move to folder
-      </button>
-      <div class="border-border bg-border my-1 h-px" />
-      <button
-        onclick={onDelete}
-        class="text-destructive hover:bg-destructive/10 flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[11px] transition-colors"
-      >
-        <Trash2 size={11} />
-        Delete
-      </button>
     </div>
   {/if}
 </div>
