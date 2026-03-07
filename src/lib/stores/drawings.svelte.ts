@@ -26,6 +26,10 @@ class DrawingsStore {
     }
   }
 
+  public setDrawings(drawings: DrawingData[]): void {
+    this.#list = drawings;
+  }
+
   get loading(): boolean {
     return this.#loading;
   }

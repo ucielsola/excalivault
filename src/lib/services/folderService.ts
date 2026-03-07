@@ -2,13 +2,10 @@ import browser from "webextension-polyfill";
 
 import {
   MessageType,
-  type CreateFolderMessage,
   type CreateFolderResponse,
-  type DeleteFolderMessage,
   type DeleteFolderResponse,
   type DrawingMessage,
   type FolderData,
-  type UpdateFolderMessage,
   type UpdateFolderResponse,
 } from "$lib/types";
 
@@ -29,8 +26,8 @@ class FolderService {
     name: string,
     parentId: string | null = null,
     color: string,
-  ): Promise<void> {
-    await this.sendMessage<CreateFolderResponse>({
+  ): Promise<CreateFolderResponse> {
+    return this.sendMessage<CreateFolderResponse>({
       type: MessageType.CREATE_FOLDER,
       payload: { name, parentId, color },
     });
@@ -40,15 +37,15 @@ class FolderService {
     id: string,
     name: string,
     color?: string,
-  ): Promise<void> {
-    await this.sendMessage<UpdateFolderResponse>({
+  ): Promise<UpdateFolderResponse> {
+    return this.sendMessage<UpdateFolderResponse>({
       type: MessageType.UPDATE_FOLDER,
       payload: { id, name, color },
     });
   }
 
-  public async deleteFolder(id: string): Promise<void> {
-    await this.sendMessage<DeleteFolderResponse>({
+  public async deleteFolder(id: string): Promise<DeleteFolderResponse> {
+    return this.sendMessage<DeleteFolderResponse>({
       type: MessageType.DELETE_FOLDER,
       payload: { id },
     });

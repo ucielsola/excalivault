@@ -2,6 +2,7 @@ import { folderService } from "$lib/services/folderService";
 import { captureException } from "$lib/services/sentry";
 import { type FolderData, type SortBy, type SortOrder } from "$lib/types";
 import { COLOR_VALUES } from "$lib/utils/folderColors";
+import { drawings } from "./drawings.svelte";
 
 class FoldersStore {
   #loading = $state<boolean>(false);
@@ -30,50 +31,68 @@ class FoldersStore {
     parentId: string | null = null,
     color?: string,
   ): Promise<void> {
-    this.#loading = true;
-    this.#error = null;
-
     const folderColor =
       color ?? COLOR_VALUES[this.#folders.length % COLOR_VALUES.length];
 
+    const tempId = `temp-${Date.now()}`;
+    const optimisticFolder: FolderData = {
+      id: tempId,
+      name,
+      parentId,
+      color: folderColor,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    this.#folders = [...this.#folders, optimisticFolder];
+    this.#error = null;
+
     try {
-      await folderService.createFolder(name, parentId, folderColor);
-      await this.loadFolders();
+      const response = await folderService.createFolder(name, parentId, folderColor);
+      this.#folders = response.folders;
     } catch (e) {
+      this.#folders = this.#folders.filter((f) => f.id !== tempId);
       this.#error = "Failed to create folder";
       captureException(e as Error);
-    } finally {
-      this.#loading = false;
     }
   }
 
   public async updateFolder(id: string, name: string): Promise<void> {
-    this.#loading = true;
+    const folder = this.#folders.find((f) => f.id === id);
+    if (!folder) return;
+
+    const originalName = folder.name;
+    folder.name = name;
+    this.#folders = [...this.#folders];
     this.#error = null;
 
     try {
-      await folderService.updateFolder(id, name);
-      await this.loadFolders();
+      const response = await folderService.updateFolder(id, name);
+      this.#folders = response.folders;
     } catch (e) {
+      folder.name = originalName;
+      this.#folders = [...this.#folders];
       this.#error = "Failed to update folder";
       captureException(e as Error);
-    } finally {
-      this.#loading = false;
     }
   }
 
   public async deleteFolder(id: string): Promise<void> {
-    this.#loading = true;
+    const folder = this.#folders.find((f) => f.id === id);
+    if (!folder) return;
+
+    const previousFolders = [...this.#folders];
+    this.#folders = this.#folders.filter((f) => f.id !== id);
     this.#error = null;
 
     try {
-      await folderService.deleteFolder(id);
-      await this.loadFolders();
+      const response = await folderService.deleteFolder(id);
+      this.#folders = response.folders;
+      drawings.setDrawings(response.drawings);
     } catch (e) {
+      this.#folders = previousFolders;
       this.#error = "Failed to delete folder";
       captureException(e as Error);
-    } finally {
-      this.#loading = false;
     }
   }
 
