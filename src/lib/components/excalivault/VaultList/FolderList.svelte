@@ -2,7 +2,7 @@
   import { FolderOpen, Search } from "@lucide/svelte";
   import { vaultList, folders } from "$lib/stores";
   import FolderItem from "./FolderItem.svelte";
-  import VaultListItem from "../VaultListItem.svelte";
+  import VaultListItem from "./VaultListItem.svelte";
 
   let rootFolders = $derived(vaultList.rootFolders);
   let rootDrawings = $derived(vaultList.rootDrawings);

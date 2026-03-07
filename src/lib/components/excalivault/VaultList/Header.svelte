@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ChevronLeft, ChevronRight, FolderPlus } from "@lucide/svelte";
   import { drawings, vaultList } from "$lib/stores";
-  import VaultLogo from "../VaultLogo.svelte";
+  import VaultLogo from "$lib/components/excalivault/VaultLogo.svelte";
 
   const totalCount = $derived(drawings.list.length);
   let currentFolderId = $derived(vaultList.currentFolderId);
