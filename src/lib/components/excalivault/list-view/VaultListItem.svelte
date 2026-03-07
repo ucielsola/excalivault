@@ -1,7 +1,7 @@
 <script lang="ts">
   import { EllipsisVertical, FileText, Pencil, Trash2 } from "@lucide/svelte";
 
-  import InlineInput from "$lib/components/excalivault/InlineInput.svelte";
+  import { InlineInput } from "$lib/components/excalivault/shared";
   import {
     DropdownMenu,
     DropdownMenuContent,

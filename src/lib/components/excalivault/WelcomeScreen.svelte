@@ -9,8 +9,8 @@
   import { Button } from "$lib/components/ui/button";
   import { browserTab, drawings } from "$lib/stores";
 
-  import SaveCurrent from "./SaveCurrent.svelte";
-  import VaultLogo from "./VaultLogo.svelte";
+  import { SaveCurrent } from "./dialogs";
+  import { VaultLogo } from "./shared";
 
   let {
     children,

@@ -10,9 +10,9 @@
     Trash2,
   } from "@lucide/svelte";
 
-  import FolderCreation from "$lib/components/excalivault/FolderCreation.svelte";
-  import InlineInput from "$lib/components/excalivault/InlineInput.svelte";
-  import * as VaultList from "$lib/components/excalivault/VaultList";
+  import { InlineInput } from "$lib/components/excalivault/shared";
+  import { FolderCreation } from ".";
+  import { VaultListItem } from ".";
   import {
     DropdownMenu,
     DropdownMenuContent,
@@ -104,7 +104,7 @@
                 Change colour
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                {#each Object.entries(FOLDER_COLORS) as [name, colorValue]}
+                {#each Object.entries(FOLDER_COLORS) as [name, colorValue] (name)}
                   <DropdownMenuItem
                     class="flex items-center gap-2"
                     onclick={() => vaultList.handleChangeFolderColor(folder.id, colorValue)}
@@ -151,7 +151,7 @@
     {#if folderDrawings.length > 0}
       <div class="border-border/30 bg-secondary/20 border-b">
         {#each folderDrawings as drawing (drawing.id)}
-          <VaultList.VaultListItem
+          <VaultListItem
             {drawing}
             indent={true}
             isRenaming={vaultList.renamingId === drawing.id}

@@ -2,6 +2,8 @@
   import AlertTriangleIcon from "@lucide/svelte/icons/alert-triangle";
   import SaveIcon from "@lucide/svelte/icons/save";
 
+  import KeyboardEventHandler from "$lib/components/excalivault/dialogs/KeyboardEventHandler.svelte";
+  import { VaultLogo } from "$lib/components/excalivault/shared";
   import { Button } from "$lib/components/ui/button";
   import {
     Dialog,
@@ -13,8 +15,6 @@
   } from "$lib/components/ui/dialog";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-
-  import VaultLogo from "./VaultLogo.svelte";
 
   let {
     open = false,
@@ -50,6 +50,8 @@
     name = "";
   }
 </script>
+
+  <KeyboardEventHandler onEnter={handleSave} onEsc={onCancel} />
 
 <div class="flex h-full flex-col">
   <div

@@ -1,12 +1,12 @@
 <script lang="ts">
   import { ChevronLeft, ChevronRight, FolderPlus } from "@lucide/svelte";
   import { drawings, vaultList } from "$lib/stores";
-  import VaultLogo from "$lib/components/excalivault/VaultLogo.svelte";
+  import { VaultLogo } from "$lib/components/excalivault/shared";
 
   const totalCount = $derived(drawings.list.length);
   let currentFolderId = $derived(vaultList.currentFolderId);
   let activeFolder = $derived(vaultList.activeFolder);
-  let creatingFolder = $derived(vaultList.creatingFolder);
+
 </script>
 
 <div class="border-border flex items-center justify-between border-b px-4 py-3">

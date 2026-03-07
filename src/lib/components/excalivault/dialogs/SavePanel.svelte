@@ -1,6 +1,15 @@
 <script lang="ts">
-  import { ChevronDown, FolderOpen, Replace, Save, TriangleAlert, X } from "@lucide/svelte";
-  import { vaultList, folders, drawings } from "$lib/stores";
+  import {
+    ChevronDown,
+    FolderOpen,
+    Replace,
+    Save,
+    TriangleAlert,
+    X,
+  } from "@lucide/svelte";
+
+  import KeyboardEventHandler from "$lib/components/excalivault/dialogs/KeyboardEventHandler.svelte";
+  import { drawings, folders, vaultList } from "$lib/stores";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
 
   let savePanelOpen = $derived(vaultList.savePanelOpen);
@@ -10,8 +19,12 @@
   let overwriteTargetId = $derived(vaultList.overwriteTargetId);
   let activeFolder = $derived(vaultList.activeFolder);
   let currentFolderId = $derived(vaultList.currentFolderId);
-  let newCopyInputRef = $derived(vaultList.newCopyInputRef);
+
+  const handleSave = () => saveMode === "new" ? vaultList.handleSaveNewCopy() : vaultList.handleOverwrite();
+  const onCancel = () => vaultList.closeSavePanel();
 </script>
+
+<KeyboardEventHandler onEnter={handleSave} onEsc={onCancel} />
 
 {#if savePanelOpen}
   <div class="bg-card border-primary/20 border-t">
@@ -119,8 +132,7 @@
                             ?.color || '',
                         )}"
                       >
-                        {folders.folders.find((f) => f.id === d.folderId)
-                          ?.name}
+                        {folders.folders.find((f) => f.id === d.folderId)?.name}
                       </span>
                     {/if}
                   </p>

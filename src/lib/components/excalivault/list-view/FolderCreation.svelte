@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { FolderOpen, Palette, Check, X } from "@lucide/svelte";
+  import { FolderOpen, Check, X } from "@lucide/svelte";
   import { COLOR_VALUES, FOLDER_COLORS, getFolderBadgeClass } from "$lib/utils/folderColors";
+  import type { FolderColorValue } from "$lib/utils/folderColors";
   import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,7 +17,7 @@
   let { onConfirm, onCancel }: Props = $props();
 
   let name = $state("");
-  let color = $state(COLOR_VALUES[Math.floor(Math.random() * COLOR_VALUES.length)] as any);
+  let color = $state(COLOR_VALUES[Math.floor(Math.random() * COLOR_VALUES.length)] as FolderColorValue);
   let inputRef = $state<HTMLInputElement>();
   let ignoreBlur = $state(false);
   let colorMenuOpen = $state(false);
@@ -24,7 +25,7 @@
 
   $effect(() => {
     if (inputRef) {
-      requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
         if (inputRef) {
           inputRef.focus();
           inputRef.select();
@@ -61,7 +62,7 @@
     ignoreBlur = true;
   }
 
-  function handleColorPickerMouseDownUp(e: MouseEvent) {
+  function handleColorPickerMouseDownUp(_e: MouseEvent) {
     ignoreBlur = false;
   }
 
@@ -74,7 +75,7 @@
 
   function handleColorChange(newColor: string) {
     justChangedColor = true;
-    color = newColor;
+    color = newColor as FolderColorValue;
     colorMenuOpen = false;
     setTimeout(() => inputRef?.focus(), 0);
   }
@@ -108,7 +109,7 @@
       </button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" class="w-40">
-      {#each Object.entries(FOLDER_COLORS) as [colorName, colorValue]}
+      {#each Object.entries(FOLDER_COLORS) as [colorName, colorValue] (colorName)}
         <DropdownMenuItem
           class="flex items-center gap-2"
           onclick={() => handleColorChange(colorValue)}

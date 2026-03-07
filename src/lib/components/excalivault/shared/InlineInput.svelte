@@ -22,7 +22,7 @@
 
   $effect(() => {
     if (autoFocus && inputRef) {
-      requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
         if (inputRef) {
           inputRef.focus();
           inputRef.select();

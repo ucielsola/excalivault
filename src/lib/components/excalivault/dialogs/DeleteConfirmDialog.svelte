@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { AlertTriangle, Trash2Icon } from "@lucide/svelte";
+  import { Trash2Icon, TriangleAlert } from "@lucide/svelte";
 
+  import KeyboardEventHandler from "$lib/components/excalivault/dialogs/KeyboardEventHandler.svelte";
+  import { VaultLogo } from "$lib/components/excalivault/shared";
   import { Button } from "$lib/components/ui/button";
   import {
     Dialog,
@@ -10,8 +12,6 @@
     DialogHeader,
     DialogTitle,
   } from "$lib/components/ui/dialog";
-
-  import VaultLogo from "./VaultLogo.svelte";
 
   let {
     open = false,
@@ -42,8 +42,12 @@
     phase = "confirm";
   }
 
-  let hasSubfolders = $derived(itemType === "folder" && (subfolderCount > 0 || subfolderDrawingCount > 0));
+  let hasSubfolders = $derived(
+    itemType === "folder" && (subfolderCount > 0 || subfolderDrawingCount > 0),
+  );
 </script>
+
+  <KeyboardEventHandler onEnter={handleConfirm} onEsc={handleReset} />
 
 <div class="flex h-full flex-col">
   <div
@@ -74,16 +78,23 @@
               ? This action cannot be undone.
             </DialogDescription>
             {#if hasSubfolders}
-              <div class="bg-destructive/5 border-destructive/20 flex items-start gap-2 rounded-md border p-3">
-                <AlertTriangle size={14} class="text-destructive shrink-0 mt-0.5" />
+              <div
+                class="bg-destructive/5 border-destructive/20 flex items-start gap-2 rounded-md border p-3"
+              >
+                <TriangleAlert
+                  size={14}
+                  class="text-destructive mt-0.5 shrink-0"
+                />
                 <div class="space-y-1">
                   <p class="text-destructive text-[11px] font-medium">
                     This will also delete:
                   </p>
                   <p class="text-muted-foreground text-[11px]">
-                    {subfolderCount > 0 && `${subfolderCount} subfolder${subfolderCount > 1 ? "s" : ""}`}
+                    {subfolderCount > 0 &&
+                      `${subfolderCount} subfolder${subfolderCount > 1 ? "s" : ""}`}
                     {subfolderCount > 0 && subfolderDrawingCount > 0 && " and "}
-                    {subfolderDrawingCount > 0 && `${subfolderDrawingCount} drawing${subfolderDrawingCount > 1 ? "s" : ""}`}
+                    {subfolderDrawingCount > 0 &&
+                      `${subfolderDrawingCount} drawing${subfolderDrawingCount > 1 ? "s" : ""}`}
                   </p>
                 </div>
               </div>
@@ -103,7 +114,9 @@
             >
               <Trash2Icon size={18} class="text-destructive" />
             </div>
-            <p class="text-muted-foreground text-xs">{itemType === "drawing" ? "Drawing" : "Folder"} deleted.</p>
+            <p class="text-muted-foreground text-xs">
+              {itemType === "drawing" ? "Drawing" : "Folder"} deleted.
+            </p>
             <button
               onclick={handleReset}
               class="text-primary text-[11px] underline underline-offset-2"

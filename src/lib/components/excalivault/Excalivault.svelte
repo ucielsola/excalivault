@@ -2,10 +2,9 @@
   import { onMount } from "svelte";
   import { Plus, Replace, Save } from "@lucide/svelte";
 
-  import DeleteConfirmDialog from "$lib/components/excalivault/DeleteConfirmDialog.svelte";
-  import FolderCreation from "$lib/components/excalivault/FolderCreation.svelte";
-  import OverwriteConfirmDialog from "$lib/components/excalivault/OverwriteConfirmDialog.svelte";
-  import * as VaultList from "$lib/components/excalivault/VaultList";
+  import { DeleteConfirmDialog, OverwriteConfirmDialog, SavePanel } from "$lib/components/excalivault/dialogs";
+  import { FolderCreation } from "$lib/components/excalivault/list-view";
+  import * as ListView from "$lib/components/excalivault/list-view";
   import WelcomeScreen from "$lib/components/excalivault/WelcomeScreen.svelte";
   import { drawings, folders, vaultList } from "$lib/stores";
 
@@ -41,9 +40,9 @@
   <WelcomeScreen />
 {:else}
   <div bind:this={listRef} class="flex h-full flex-col">
-    <VaultList.Header />
+    <ListView.Header />
 
-    <VaultList.SearchBar />
+    <ListView.SearchBar />
 
     <div class="flex-1 overflow-y-auto">
       {#if vaultList.creatingFolder}
@@ -55,14 +54,14 @@
         </div>
       {/if}
 
-      <VaultList.FolderList />
+      <ListView.FolderList />
 
-      <VaultList.EmptyState type="folder" />
-      <VaultList.EmptyState type="search" />
+      <ListView.EmptyState type="folder" />
+      <ListView.EmptyState type="search" />
     </div>
 
     {#if vaultList.savePanelOpen}
-      <VaultList.SavePanel />
+      <SavePanel />
     {:else}
       <div class="border-border border-t">
         <div
