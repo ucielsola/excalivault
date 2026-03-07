@@ -2,13 +2,20 @@
   import {
     ChevronDown,
     ChevronRight,
-    EllipsisVertical,
+    MoreVertical,
     FolderOpen,
     Pencil,
     Trash2,
   } from "@lucide/svelte";
   import { type FolderData } from "$lib/types";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
+  import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "$lib/components/ui/dropdown-menu";
   import { vaultList, folders } from "$lib/stores";
   import InlineInput from "../InlineInput.svelte";
   import VaultListItem from "../VaultListItem.svelte";
@@ -22,7 +29,6 @@
 
   let isExpanded = $derived(vaultList.expandedFolders.has(folder.id));
   let isRenaming = $derived(vaultList.renamingId === folder.id);
-  let menuOpen = $derived(vaultList.menuOpenId === folder.id);
   let folderDrawings = $derived(vaultList.drawingsInFolder(folder.id));
 </script>
 
@@ -70,67 +76,39 @@
       </div>
 
       {#if !isRenaming}
-        <div
-          class="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100"
-        >
-          <button
-            onclick={() => (vaultList.renamingId = folder.id)}
-            class="text-muted-foreground hover:bg-primary/10 hover:text-primary flex h-6 w-6 items-center justify-center rounded"
-            title="Rename folder"
-          >
-            <Pencil size={11} />
-          </button>
-          <button
-            onclick={(e) => {
-              e.stopPropagation();
-              vaultList.menuOpenId = vaultList.menuOpenId === folder.id ? null : folder.id;
-            }}
-            class="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-6 w-6 items-center justify-center rounded"
-          >
-            <EllipsisVertical size={12} />
-          </button>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <button
+              class="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-6 w-6 items-center justify-center rounded"
+            >
+              <MoreVertical size={12} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent class="w-48" align="end">
+            <DropdownMenuItem
+              onclick={() => vaultList.handleSelectFolder(folder.id)}
+            >
+              <FolderOpen size={11} />
+              Open folder
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onclick={() => (vaultList.renamingId = folder.id)}
+            >
+              <Pencil size={11} />
+              Rename
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              class="text-destructive focus:text-destructive"
+              onclick={() => vaultList.handleDeleteFolder(folder.id)}
+            >
+              <Trash2 size={11} />
+              Delete folder
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       {/if}
     </div>
-
-    {#if menuOpen}
-      <div
-        class="border-border bg-card absolute top-9 right-3 z-20 min-w-[150px] rounded-md border p-1 shadow-xl"
-      >
-        <button
-          onclick={() => {
-            vaultList.menuOpenId = null;
-            vaultList.handleSelectFolder(folder.id);
-          }}
-          class="text-foreground hover:bg-secondary flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[11px] transition-colors"
-        >
-          <FolderOpen size={11} />
-          Open folder
-        </button>
-        <button
-          onclick={() => {
-            vaultList.menuOpenId = null;
-            vaultList.renamingId = folder.id;
-          }}
-          class="text-foreground hover:bg-secondary flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[11px] transition-colors"
-        >
-          <Pencil size={11} />
-          Rename
-        </button>
-        <div class="border-border bg-border my-1 h-px"></div>
-        <button
-          onclick={() => {
-            vaultList.menuOpenId = null;
-            vaultList.handleDeleteFolder(folder.id);
-          }}
-          class="text-destructive hover:bg-destructive/10 flex w-full items-center gap-2 rounded px-2.5 py-1.5 text-left text-[11px] transition-colors"
-        >
-          <Trash2 size={11} />
-          Delete folder
-          <span class="text-muted-foreground ml-auto text-[9px]">+items</span>
-        </button>
-      </div>
-    {/if}
   </div>
 
   {#if isExpanded && folderDrawings.length > 0}
