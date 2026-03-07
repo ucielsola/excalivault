@@ -16,7 +16,7 @@
   let isRenaming = $derived(vaultList.renamingId === drawing.id);
 </script>
 
-<div class={indent ? "pl-12" : ""}>
+<div class={indent ? "pl-8" : ""}>
   <div
     class="group border-border/50 hover:bg-secondary/50 relative flex items-center gap-2 border-b px-4 py-2.5 transition-colors"
   >

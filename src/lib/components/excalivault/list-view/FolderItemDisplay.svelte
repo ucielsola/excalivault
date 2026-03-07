@@ -27,8 +27,8 @@
 <div class="flex items-center gap-2">
   <button
     onclick={onToggle}
-    class="text-muted-foreground/50 hover:bg-secondary hover:text-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors"
-    style="margin-left: {level * 20 - 20}px;"
+    class="text-muted-foreground/50 hover:bg-secondary hover:text-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors pl-1"
+    style="margin-left: {level * 14 - 14}px;"
   >
     {#if isExpanded}
       <ChevronDown size={12} />

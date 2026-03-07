@@ -83,7 +83,7 @@ let isCreatingSubfolder = $derived(vaultList.creatingSubfolderId === folder.id);
   {/if}
 
   {#if isCreatingSubfolder}
-    <div class="border-border/50 bg-secondary/10 border-b" style="padding-left: {level * 20}px;">
+    <div class="border-border/50 bg-secondary/10 border-b" style="padding-left: {level * 14}px;">
       <div class="flex items-center gap-2 px-4 py-2.5">
         <div class="h-5 w-5 shrink-0"></div>
         <FolderCreation
