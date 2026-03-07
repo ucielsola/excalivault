@@ -18,6 +18,7 @@
 
   let value = $state(initial);
   let inputRef = $state<HTMLInputElement>();
+  let ignoreBlur = $state(false);
 
   $effect(() => {
     if (autoFocus && inputRef) {
@@ -28,6 +29,7 @@
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && value.trim()) {
+      ignoreBlur = true;
       onConfirm(value.trim());
     }
     if (e.key === "Escape") {
@@ -36,6 +38,10 @@
   }
 
   function handleBlur() {
+    if (ignoreBlur) {
+      ignoreBlur = false;
+      return;
+    }
     if (value.trim()) {
       onConfirm(value.trim());
     } else {
@@ -45,6 +51,7 @@
 
   function handleConfirm() {
     if (value.trim()) {
+      ignoreBlur = true;
       onConfirm(value.trim());
     }
   }
