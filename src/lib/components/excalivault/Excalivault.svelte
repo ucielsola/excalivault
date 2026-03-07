@@ -4,6 +4,7 @@
   import EmptyVault from "$lib/components/excalivault/EmptyVault.svelte";
   import VaultList from "$lib/components/excalivault/VaultList.svelte";
   import { drawings } from "$lib/stores";
+  import { folders } from "$lib/stores/folders.svelte";
 
   const Screens = {
     Vault: "vault",
@@ -18,6 +19,7 @@
 
   onMount(async () => {
     drawings.loadDrawings();
+    folders.loadFolders();
   });
 </script>
 
