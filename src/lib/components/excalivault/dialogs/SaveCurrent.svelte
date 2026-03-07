@@ -2,7 +2,6 @@
   import AlertTriangleIcon from "@lucide/svelte/icons/alert-triangle";
   import SaveIcon from "@lucide/svelte/icons/save";
 
-  import KeyboardEventHandler from "$lib/components/excalivault/dialogs/KeyboardEventHandler.svelte";
   import { VaultLogo } from "$lib/components/excalivault/shared";
   import { Button } from "$lib/components/ui/button";
   import {
@@ -51,8 +50,6 @@
   }
 </script>
 
-  <KeyboardEventHandler onEnter={handleSave} onEsc={onCancel} />
-
 <div class="flex h-full flex-col">
   <div
     class="border-border flex items-center justify-between border-b px-4 py-3"
@@ -89,6 +86,10 @@
             bind:value={name}
             placeholder="e.g. Architecture Diagram"
             class="font-mono text-xs"
+            onkeydown={(e) => {
+              if (e.key === "Enter") handleSave();
+              if (e.key === "Escape") onCancel();
+            }}
           />
         </div>
 

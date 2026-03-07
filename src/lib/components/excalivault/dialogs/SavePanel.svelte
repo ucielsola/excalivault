@@ -8,7 +8,6 @@
     X,
   } from "@lucide/svelte";
 
-  import KeyboardEventHandler from "$lib/components/excalivault/dialogs/KeyboardEventHandler.svelte";
   import { drawings, folders, vaultList } from "$lib/stores";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
 
@@ -23,8 +22,6 @@
   const handleSave = () => saveMode === "new" ? vaultList.handleSaveNewCopy() : vaultList.handleOverwrite();
   const onCancel = () => vaultList.closeSavePanel();
 </script>
-
-<KeyboardEventHandler onEnter={handleSave} onEsc={onCancel} />
 
 {#if savePanelOpen}
   <div class="bg-card border-primary/20 border-t">

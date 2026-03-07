@@ -1,7 +1,6 @@
 <script lang="ts">
   import AlertTriangleIcon from "@lucide/svelte/icons/alert-triangle";
 
-  import KeyboardEventHandler from "$lib/components/excalivault/dialogs/KeyboardEventHandler.svelte";
   import { VaultLogo } from "$lib/components/excalivault/shared";
   import { Button } from "$lib/components/ui/button";
   import {
@@ -32,8 +31,6 @@
     onCancel();
   }
 </script>
-
-  <KeyboardEventHandler onEnter={onConfirm} onEsc={handleCancel} />
 
 <div class="flex h-full flex-col">
   <div

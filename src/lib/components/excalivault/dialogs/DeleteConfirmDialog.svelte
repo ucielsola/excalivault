@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Trash2Icon, TriangleAlert } from "@lucide/svelte";
 
-  import KeyboardEventHandler from "$lib/components/excalivault/dialogs/KeyboardEventHandler.svelte";
   import { VaultLogo } from "$lib/components/excalivault/shared";
   import { Button } from "$lib/components/ui/button";
   import {
@@ -46,8 +45,6 @@
     itemType === "folder" && (subfolderCount > 0 || subfolderDrawingCount > 0),
   );
 </script>
-
-  <KeyboardEventHandler onEnter={handleConfirm} onEsc={handleReset} />
 
 <div class="flex h-full flex-col">
   <div

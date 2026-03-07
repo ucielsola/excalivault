@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { EllipsisVertical, FileText, Pencil, Trash2 } from "@lucide/svelte";
+  import {
+    CopyPlus,
+    EllipsisVertical,
+    FileText,
+    FolderInput,
+    Pencil,
+    Trash2,
+  } from "@lucide/svelte";
 
   import { InlineInput } from "$lib/components/excalivault/shared";
   import {
@@ -125,7 +132,7 @@
         </DropdownMenuTrigger>
         <DropdownMenuContent class="w-40" align="end">
           <DropdownMenuItem onclick={onDuplicate}>
-            <Pencil size={11} />
+            <CopyPlus size={11} />
             Duplicate
           </DropdownMenuItem>
           <DropdownMenuItem onclick={onStartRename}>
@@ -133,7 +140,7 @@
             Rename
           </DropdownMenuItem>
           <DropdownMenuItem onclick={onStartMove}>
-            <FileText size={11} />
+            <FolderInput size={11} />
             Move to folder
           </DropdownMenuItem>
           <DropdownMenuSeparator />
