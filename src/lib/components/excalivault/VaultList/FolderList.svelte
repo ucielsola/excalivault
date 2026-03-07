@@ -41,7 +41,7 @@
     {drawing}
     indent={false}
     isRenaming={vaultList.renamingId === drawing.id}
-    moveTarget={vaultList.moveTarget === drawing.id}
+    moveTarget={vaultList.moveTarget}
     folders={folders.folders}
     formatDate={vaultList.formatDate}
     showFolderBadge={isSearching}

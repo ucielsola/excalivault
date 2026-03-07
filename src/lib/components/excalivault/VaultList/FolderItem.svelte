@@ -2,13 +2,14 @@
   import {
     ChevronDown,
     ChevronRight,
-    MoreVertical,
+    EllipsisVertical,
     FolderOpen,
     Pencil,
     Trash2,
   } from "@lucide/svelte";
-  import { type FolderData } from "$lib/types";
-  import { getFolderBadgeClass } from "$lib/utils/folderColors";
+
+  import InlineInput from "$lib/components/excalivault/InlineInput.svelte";
+  import * as VaultList from "$lib/components/excalivault/VaultList";
   import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,9 +17,9 @@
     DropdownMenuSeparator,
     DropdownMenuTrigger,
   } from "$lib/components/ui/dropdown-menu";
-  import { vaultList, folders } from "$lib/stores";
-  import InlineInput from "../InlineInput.svelte";
-  import VaultListItem from "../VaultListItem.svelte";
+  import { folders, vaultList } from "$lib/stores";
+  import { type FolderData } from "$lib/types";
+  import { getFolderBadgeClass } from "$lib/utils/folderColors";
 
   interface Props {
     folder: FolderData;
@@ -57,7 +58,8 @@
         {#if isRenaming}
           <InlineInput
             initial={folder.name}
-            onConfirm={(v: string) => vaultList.handleRenameFolder(folder.id, v)}
+            onConfirm={(v: string) =>
+              vaultList.handleRenameFolder(folder.id, v)}
             onCancel={() => (vaultList.renamingId = null)}
           />
         {:else}
@@ -81,7 +83,7 @@
             <button
               class="text-muted-foreground hover:bg-secondary hover:text-foreground flex h-6 w-6 items-center justify-center rounded"
             >
-              <MoreVertical size={12} />
+              <EllipsisVertical size={12} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent class="w-48" align="end">
@@ -114,16 +116,17 @@
   {#if isExpanded && folderDrawings.length > 0}
     <div class="border-border/30 bg-secondary/20 border-b">
       {#each folderDrawings as drawing (drawing.id)}
-        <VaultListItem
+        <VaultList.VaultListItem
           {drawing}
           indent={true}
           isRenaming={vaultList.renamingId === drawing.id}
-          moveTarget={vaultList.moveTarget === drawing.id}
+          moveTarget={vaultList.moveTarget}
           folders={folders.folders}
           formatDate={vaultList.formatDate}
           onOpen={() => vaultList.handleOpen(drawing)}
           onDelete={() => vaultList.handleDelete(drawing.id)}
-          onRename={(name: string) => vaultList.handleRenameDrawing(drawing.id, name)}
+          onRename={(name: string) =>
+            vaultList.handleRenameDrawing(drawing.id, name)}
           onStartRename={() => {
             vaultList.renamingId = drawing.id;
           }}

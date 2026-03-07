@@ -1,13 +1,12 @@
 <script lang="ts">
   import { FolderOpen, Plus, Replace, Save } from "@lucide/svelte";
 
+  import ConfirmOpen from "$lib/components/excalivault/ConfirmOpen.svelte";
+  import DeleteConfirm from "$lib/components/excalivault/DeleteConfirm.svelte";
+  import InlineInput from "$lib/components/excalivault/InlineInput.svelte";
   import * as VaultList from "$lib/components/excalivault/VaultList";
   import { drawings, folders, vaultList } from "$lib/stores";
   import { COLOR_VALUES, getFolderBadgeClass } from "$lib/utils/folderColors";
-
-  import ConfirmOpen from "./ConfirmOpen.svelte";
-  import DeleteConfirm from "./DeleteConfirm.svelte";
-  import InlineInput from "./InlineInput.svelte";
 
   let listRef = $state<HTMLDivElement | null>(null);
 
