@@ -3,24 +3,19 @@
     CopyPlus,
     EllipsisVertical,
     FolderInput,
-    FolderOpen,
-    FolderX,
     Pencil,
     Trash2,
   } from "@lucide/svelte";
 
+  import { FolderSelectDialog } from "$lib/components/excalivault/dialogs";
   import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuSeparator,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
   } from "$lib/components/ui/dropdown-menu";
-  import { drawings, folders } from "$lib/stores";
-  import { getFolderBadgeClass } from "$lib/utils/folderColors";
+  import { drawings } from "$lib/stores";
 
   interface Props {
     onDuplicate: () => void;
@@ -30,12 +25,27 @@
     currentFolderId: string | null;
   }
 
-  let { onDuplicate, onStartRename, onDelete, drawingId, currentFolderId }: Props = $props();
+  let {
+    onDuplicate,
+    onStartRename,
+    onDelete,
+    drawingId,
+    currentFolderId,
+  }: Props = $props();
 
-  let rootFolders = $derived(folders.getFolderChildren(null));
+  let isMoveDialogOpen = $state(false);
 
-  function isCurrentFolder(folderId: string | null): boolean {
-    return folderId === currentFolderId;
+  function handleOpenMoveDialog() {
+    isMoveDialogOpen = true;
+  }
+
+  function handleCloseMoveDialog() {
+    isMoveDialogOpen = false;
+  }
+
+  function handleMoveToFolder(folderId: string | null) {
+    drawings.moveDrawing(drawingId, folderId);
+    isMoveDialogOpen = false;
   }
 </script>
 
@@ -56,73 +66,10 @@
       <Pencil size={11} />
       Rename
     </DropdownMenuItem>
-    <DropdownMenuSub>
-      <DropdownMenuSubTrigger>
-        <FolderInput size={11} />
-        Move to folder
-      </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent>
-        {#each rootFolders as folder (folder.id)}
-          {@const childFolders = folders.getFolderChildren(folder.id)}
-          {#if childFolders.length > 0}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger class="flex items-center gap-2">
-                <FolderOpen size={11} class={getFolderBadgeClass(folder.color)} />
-                <span class={isCurrentFolder(folder.id) ? "font-semibold" : ""}>{folder.name}</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                {#each childFolders as child (child.id)}
-                  {@const grandchildren = folders.getFolderChildren(child.id)}
-                  {#if grandchildren.length > 0}
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger class="flex items-center gap-2">
-                        <FolderOpen size={11} class={getFolderBadgeClass(child.color)} />
-                        <span class={isCurrentFolder(child.id) ? "font-semibold" : ""}>{child.name}</span>
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent>
-                        {#each grandchildren as grandchild (grandchild.id)}
-                          <DropdownMenuItem
-                            class="flex items-center gap-2"
-                            onclick={() => drawings.moveDrawing(drawingId, grandchild.id)}
-                          >
-                            <FolderOpen size={11} class={getFolderBadgeClass(grandchild.color)} />
-                            <span class={isCurrentFolder(grandchild.id) ? "font-semibold" : ""}>{grandchild.name}</span>
-                          </DropdownMenuItem>
-                        {/each}
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
-                  {:else}
-                    <DropdownMenuItem
-                      class="flex items-center gap-2"
-                      onclick={() => drawings.moveDrawing(drawingId, child.id)}
-                    >
-                      <FolderOpen size={11} class={getFolderBadgeClass(child.color)} />
-                      <span class={isCurrentFolder(child.id) ? "font-semibold" : ""}>{child.name}</span>
-                    </DropdownMenuItem>
-                  {/if}
-                {/each}
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-          {:else}
-            <DropdownMenuItem
-              class="flex items-center gap-2"
-              onclick={() => drawings.moveDrawing(drawingId, folder.id)}
-            >
-              <FolderOpen size={11} class={getFolderBadgeClass(folder.color)} />
-              <span class={isCurrentFolder(folder.id) ? "font-semibold" : ""}>{folder.name}</span>
-            </DropdownMenuItem>
-          {/if}
-        {/each}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          class="flex items-center gap-2"
-          onclick={() => drawings.moveDrawing(drawingId, null)}
-        >
-          <FolderX size={11} />
-          <span class={isCurrentFolder(null) ? "font-semibold" : ""}>Unfiled</span>
-        </DropdownMenuItem>
-      </DropdownMenuSubContent>
-    </DropdownMenuSub>
+    <DropdownMenuItem onclick={handleOpenMoveDialog}>
+      <FolderInput size={11} />
+      Move to folder
+    </DropdownMenuItem>
     <DropdownMenuSeparator />
     <DropdownMenuItem
       class="text-destructive focus:text-destructive"
@@ -133,3 +80,10 @@
     </DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
+
+<FolderSelectDialog
+  open={isMoveDialogOpen}
+  {currentFolderId}
+  onMove={handleMoveToFolder}
+  onCancel={handleCloseMoveDialog}
+/>

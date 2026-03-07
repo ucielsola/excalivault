@@ -20,6 +20,7 @@ let isRenaming = $derived(vaultList.renamingId === folder.id);
 let folderDrawings = $derived(vaultList.drawingsInFolder(folder.id));
 let childFolders = $derived(folders.getFolderChildren(folder.id));
 let isCreatingSubfolder = $derived(vaultList.creatingSubfolderId === folder.id);
+let hasContent = $derived(folderDrawings.length > 0 || childFolders.length > 0);
 </script>
 
 <div>
@@ -41,6 +42,7 @@ let isCreatingSubfolder = $derived(vaultList.creatingSubfolderId === folder.id);
             {level}
             {isExpanded}
             drawingsCount={folderDrawings.length}
+            {hasContent}
             onToggle={() => vaultList.toggleFolder(folder.id)}
             onSelect={() => vaultList.handleSelectFolder(folder.id)}
           />

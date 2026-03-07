@@ -8,6 +8,7 @@
     level: number;
     isExpanded: boolean;
     drawingsCount: number;
+    hasContent: boolean;
     onToggle: () => void;
     onSelect: () => void;
   }
@@ -17,6 +18,7 @@
     level,
     isExpanded,
     drawingsCount,
+    hasContent,
     onToggle,
     onSelect,
   }: Props = $props();
@@ -25,17 +27,24 @@
 </script>
 
 <div class="flex items-center gap-2">
-  <button
-    onclick={onToggle}
-    class="text-muted-foreground/50 hover:bg-secondary hover:text-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors pl-1"
-    style="margin-left: {level * 14 - 14}px;"
-  >
-    {#if isExpanded}
-      <ChevronDown size={12} />
-    {:else}
-      <ChevronRight size={12} />
-    {/if}
-  </button>
+  {#if hasContent}
+    <button
+      onclick={onToggle}
+      class="text-muted-foreground/50 hover:bg-secondary hover:text-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors pl-1"
+      style="margin-left: {level * 14 - 14}px;"
+    >
+      {#if isExpanded}
+        <ChevronDown size={12} />
+      {:else}
+        <ChevronRight size={12} />
+      {/if}
+    </button>
+  {:else}
+    <div
+      class="h-5 w-5 shrink-0"
+      style="margin-left: {level * 14 - 14}px;"
+    ></div>
+  {/if}
 
   <button
     onclick={onSelect}
