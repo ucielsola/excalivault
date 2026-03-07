@@ -8,12 +8,14 @@
 
   let {
     open = false,
-    drawingName = "",
+    itemName = "",
+    itemType = "drawing",
     onConfirm = () => {},
     onCancel = () => {},
   }: {
     open: boolean;
-    drawingName: string;
+    itemName: string;
+    itemType?: "drawing" | "folder";
     onConfirm: () => void;
     onCancel: () => void;
   } = $props();
@@ -54,7 +56,7 @@
               </div>
               <div>
                 <h3 class="text-foreground text-sm font-semibold">
-                  Delete drawing?
+                  Delete {itemType}?
                 </h3>
               </div>
             </div>
@@ -69,7 +71,7 @@
           <div class="px-4 py-2">
             <p class="text-muted-foreground text-xs leading-relaxed">
               Are you sure you want to permanently delete
-              <span class="text-foreground font-medium">"{drawingName}"</span>
+              <span class="text-foreground font-medium">"{itemName}"</span>
               ? This action cannot be undone.
             </p>
           </div>
@@ -88,7 +90,7 @@
           >
             <Trash2Icon size={18} class="text-destructive" />
           </div>
-          <p class="text-muted-foreground text-xs">Drawing deleted.</p>
+          <p class="text-muted-foreground text-xs">{itemType === "drawing" ? "Drawing" : "Folder"} deleted.</p>
           <button
             onclick={handleReset}
             class="text-primary text-[11px] underline underline-offset-2"

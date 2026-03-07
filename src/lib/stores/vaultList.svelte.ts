@@ -1,5 +1,5 @@
 import { drawings, folders } from "$lib/stores";
-import { type DrawingData } from "$lib/types";
+import { type DrawingData, type FolderData } from "$lib/types";
 
 type SaveMode = "idle" | "new" | "overwrite";
 type SavingState = "idle" | "saving" | "done";
@@ -7,6 +7,7 @@ type SavingState = "idle" | "saving" | "done";
 class VaultListStore {
   #menuOpenId = $state<string | null>(null);
   #selectedDrawing = $state<DrawingData | null>(null);
+  #selectedFolder = $state<FolderData | null>(null);
   #currentFolderId = $state<string | null>(null);
   #confirmOpenOpen = $state(false);
   #deleteConfirmOpen = $state(false);
@@ -35,6 +36,14 @@ class VaultListStore {
 
   set selectedDrawing(value: DrawingData | null) {
     this.#selectedDrawing = value;
+  }
+
+  get selectedFolder(): FolderData | null {
+    return this.#selectedFolder;
+  }
+
+  set selectedFolder(value: FolderData | null) {
+    this.#selectedFolder = value;
   }
 
   get currentFolderId(): string | null {
@@ -237,6 +246,18 @@ class VaultListStore {
     this.#deleteConfirmOpen = false;
   }
 
+  async confirmDeleteFolder(): Promise<void> {
+    if (!this.#selectedFolder) return;
+    await folders.deleteFolder(this.#selectedFolder.id);
+    this.#selectedFolder = null;
+    this.#deleteConfirmOpen = false;
+  }
+
+  cancelDeleteFolder(): void {
+    this.#selectedFolder = null;
+    this.#deleteConfirmOpen = false;
+  }
+
   handleSelectFolder(folderId: string | null): void {
     this.#currentFolderId = folderId;
   }
@@ -258,6 +279,7 @@ class VaultListStore {
   async handleDeleteFolder(id: string): Promise<void> {
     const folder = folders.folders.find((f) => f.id === id);
     if (!folder) return;
+    this.#selectedFolder = folder;
     this.#deleteConfirmOpen = true;
   }
 

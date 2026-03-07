@@ -13,6 +13,7 @@
   let creatingFolder = $derived(vaultList.creatingFolder);
   let savePanelOpen = $derived(vaultList.savePanelOpen);
   let selectedDrawing = $derived(vaultList.selectedDrawing);
+  let selectedFolder = $derived(vaultList.selectedFolder);
   let confirmOpenOpen = $derived(vaultList.confirmOpenOpen);
   let deleteConfirmOpen = $derived(vaultList.deleteConfirmOpen);
 
@@ -111,12 +112,15 @@
     />
   {/if}
 
-  {#if deleteConfirmOpen && selectedDrawing}
+  {#if deleteConfirmOpen && (selectedDrawing || selectedFolder)}
     <DeleteConfirm
       open={deleteConfirmOpen}
-      drawingName={selectedDrawing.name}
-      onConfirm={() => vaultList.confirmDelete()}
-      onCancel={() => vaultList.cancelDelete()}
+      itemName={selectedDrawing?.name ?? selectedFolder?.name ?? ""}
+      itemType={selectedDrawing ? "drawing" : "folder"}
+      onConfirm={() =>
+        selectedDrawing ? vaultList.confirmDelete() : vaultList.confirmDeleteFolder()}
+      onCancel={() =>
+        selectedDrawing ? vaultList.cancelDelete() : vaultList.cancelDeleteFolder()}
     />
   {/if}
 </div>
