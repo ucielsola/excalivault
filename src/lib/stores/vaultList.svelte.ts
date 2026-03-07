@@ -14,7 +14,6 @@ class VaultListStore {
   #creatingFolder = $state(false);
   #creatingSubfolderId = $state<string | null>(null);
   #renamingId = $state<string | null>(null);
-  #moveTarget = $state<string | null>(null);
   #savePanelOpen = $state(false);
   #saveMode = $state<SaveMode>("idle");
   #newCopyName = $state("");
@@ -95,14 +94,6 @@ class VaultListStore {
 
   set renamingId(value: string | null) {
     this.#renamingId = value;
-  }
-
-  get moveTarget(): string | null {
-    return this.#moveTarget;
-  }
-
-  set moveTarget(value: string | null) {
-    this.#moveTarget = value;
   }
 
   get savePanelOpen(): boolean {
@@ -315,18 +306,6 @@ class VaultListStore {
     this.#deleteConfirmOpen = true;
   }
 
-  async confirmMoveDrawing(folderId: string | null): Promise<void> {
-    if (!this.#moveTarget) return;
-    await drawings.moveDrawing(this.#moveTarget, folderId);
-    this.#moveTarget = null;
-    this.#menuOpenId = null;
-  }
-
-  cancelMoveDrawing(): void {
-    this.#moveTarget = null;
-    this.#menuOpenId = null;
-  }
-
   startRename(id: string): void {
     this.#renamingId = id;
   }
@@ -338,10 +317,6 @@ class VaultListStore {
   async handleRenameDrawing(id: string, newName: string): Promise<void> {
     await drawings.updateDrawingName(id, newName);
     this.#renamingId = null;
-  }
-
-  startMove(id: string): void {
-    this.#moveTarget = id;
   }
 
   async handleDuplicateDrawing(id: string): Promise<void> {

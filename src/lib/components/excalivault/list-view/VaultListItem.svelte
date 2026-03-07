@@ -1,7 +1,6 @@
 <script lang="ts">
   import VaultListItemActions from "$lib/components/excalivault/list-view/VaultListItemActions.svelte";
   import VaultListItemDisplay from "$lib/components/excalivault/list-view/VaultListItemDisplay.svelte";
-  import VaultListItemMove from "$lib/components/excalivault/list-view/VaultListItemMove.svelte";
   import VaultListItemRename from "$lib/components/excalivault/list-view/VaultListItemRename.svelte";
   import { vaultList } from "$lib/stores";
   import { type DrawingData } from "$lib/types";
@@ -15,7 +14,6 @@
   let { drawing, indent = false, showFolderBadge = false }: Props = $props();
 
   let isRenaming = $derived(vaultList.renamingId === drawing.id);
-  let isMoving = $derived(vaultList.moveTarget === drawing.id);
 </script>
 
 <div class={indent ? "pl-12" : ""}>
@@ -39,17 +37,13 @@
       {/if}
     </div>
 
-    {#if isMoving}
-      <VaultListItemMove
-        onMove={(folderId) => vaultList.confirmMoveDrawing(folderId)}
-        onCancel={() => vaultList.cancelMoveDrawing()}
-      />
-    {:else if !isRenaming}
+    {#if !isRenaming}
       <VaultListItemActions
         onDuplicate={() => vaultList.handleDuplicateDrawing(drawing.id)}
         onStartRename={() => vaultList.startRename(drawing.id)}
-        onStartMove={() => vaultList.startMove(drawing.id)}
         onDelete={() => vaultList.handleDelete(drawing.id)}
+        drawingId={drawing.id}
+        currentFolderId={drawing.folderId}
       />
     {/if}
   </div>
