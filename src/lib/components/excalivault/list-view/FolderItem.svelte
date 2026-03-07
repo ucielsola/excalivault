@@ -10,9 +10,9 @@
     Trash2,
   } from "@lucide/svelte";
 
-  import { InlineInput } from "$lib/components/excalivault/shared";
-  import { FolderCreation } from ".";
-  import { VaultListItem } from ".";
+  import InlineInput from "$lib/components/excalivault/shared/InlineInput.svelte";
+  import FolderCreation from "$lib/components/excalivault/list-view/FolderCreation.svelte";
+  import VaultListItem from "$lib/components/excalivault/list-view/VaultListItem.svelte";
   import {
     DropdownMenu,
     DropdownMenuContent,
@@ -154,24 +154,7 @@
           <VaultListItem
             {drawing}
             indent={true}
-            isRenaming={vaultList.renamingId === drawing.id}
-            moveTarget={vaultList.moveTarget}
-            folders={folders.folders}
-            formatDate={vaultList.formatDate}
-            onOpen={() => vaultList.handleOpen(drawing)}
-            onDelete={() => vaultList.handleDelete(drawing.id)}
-            onRename={(name: string) =>
-              vaultList.handleRenameDrawing(drawing.id, name)}
-            onStartRename={() => {
-              vaultList.renamingId = drawing.id;
-            }}
-            onCancelRename={() => (vaultList.renamingId = null)}
-            onDuplicate={() => vaultList.handleDuplicateDrawing(drawing.id)}
-            onStartMove={() => {
-              vaultList.moveTarget = drawing.id;
-            }}
-            onMove={(folderId: string | null) => vaultList.confirmMoveDrawing(folderId)}
-            onCancelMove={() => vaultList.cancelMoveDrawing()}
+            showFolderBadge={false}
           />
         {/each}
       </div>

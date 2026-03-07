@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { folders, vaultList } from "$lib/stores";
-  import FolderItem from "./FolderItem.svelte";
-  import VaultListItem from "./VaultListItem.svelte";
+  import { vaultList } from "$lib/stores";
+  import FolderItem from "$lib/components/excalivault/list-view/FolderItem.svelte";
+  import VaultListItem from "$lib/components/excalivault/list-view/VaultListItem.svelte";
 
   let rootFolders = $derived(vaultList.rootFolders);
   let rootDrawings = $derived(vaultList.rootDrawings);
@@ -39,29 +39,6 @@
   <VaultListItem
     {drawing}
     indent={false}
-    isRenaming={vaultList.renamingId === drawing.id}
-    moveTarget={vaultList.moveTarget}
-    folders={folders.folders}
-    formatDate={vaultList.formatDate}
     showFolderBadge={isSearching}
-    folderName={isSearching && drawing.folderId
-      ? folders.folders.find((f) => f.id === drawing.folderId)?.name
-      : undefined}
-    folderColor={isSearching && drawing.folderId
-      ? folders.folders.find((f) => f.id === drawing.folderId)?.color
-      : undefined}
-    onOpen={() => vaultList.handleOpen(drawing)}
-    onDelete={() => vaultList.handleDelete(drawing.id)}
-    onRename={(name: string) => vaultList.handleRenameDrawing(drawing.id, name)}
-    onStartRename={() => {
-      vaultList.renamingId = drawing.id;
-    }}
-    onCancelRename={() => (vaultList.renamingId = null)}
-    onDuplicate={() => vaultList.handleDuplicateDrawing(drawing.id)}
-    onStartMove={() => {
-      vaultList.moveTarget = drawing.id;
-    }}
-    onMove={(folderId: string | null) => vaultList.confirmMoveDrawing(folderId)}
-    onCancelMove={() => vaultList.cancelMoveDrawing()}
   />
 {/each}

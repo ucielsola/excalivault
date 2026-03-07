@@ -4,4 +4,8 @@ export { default as FolderItem } from "./FolderItem.svelte";
 export { default as FolderList } from "./FolderList.svelte";
 export { default as EmptyState } from "./EmptyState.svelte";
 export { default as VaultListItem } from "./VaultListItem.svelte";
+export { default as VaultListItemDisplay } from "./VaultListItemDisplay.svelte";
+export { default as VaultListItemRename } from "./VaultListItemRename.svelte";
+export { default as VaultListItemMove } from "./VaultListItemMove.svelte";
+export { default as VaultListItemActions } from "./VaultListItemActions.svelte";
 export { default as FolderCreation } from "./FolderCreation.svelte";

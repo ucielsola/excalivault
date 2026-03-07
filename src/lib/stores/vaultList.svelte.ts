@@ -327,9 +327,21 @@ class VaultListStore {
     this.#menuOpenId = null;
   }
 
+  startRename(id: string): void {
+    this.#renamingId = id;
+  }
+
+  cancelRename(): void {
+    this.#renamingId = null;
+  }
+
   async handleRenameDrawing(id: string, newName: string): Promise<void> {
     await drawings.updateDrawingName(id, newName);
     this.#renamingId = null;
+  }
+
+  startMove(id: string): void {
+    this.#moveTarget = id;
   }
 
   async handleDuplicateDrawing(id: string): Promise<void> {
