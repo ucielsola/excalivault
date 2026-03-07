@@ -90,6 +90,10 @@ class FoldersStore {
     return this.#expandedFolders.has(id);
   }
 
+  get expandedFolders(): Set<string> {
+    return this.#expandedFolders;
+  }
+
   get sortedFolders(): FolderData[] {
     const folders = [...this.#folders];
     folders.sort((a, b) => {
