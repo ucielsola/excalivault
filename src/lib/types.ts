@@ -46,6 +46,7 @@ export enum MessageType {
   DELETE_FOLDER = "DELETE_FOLDER",
   MOVE_DRAWING = "MOVE_DRAWING",
   DRAWING_CHANGED = "DRAWING_CHANGED",
+  GET_THUMBNAIL = "GET_THUMBNAIL",
 }
 
 export type GetDrawingDataMessage = {
@@ -111,6 +112,10 @@ export type GetDrawingDataResponse = {
   elements: string;
   appState: string;
   imageBase64?: string;
+};
+
+export type GetThumbnailResponse = {
+  thumbnailBase64: string | null;
 };
 
 export type UpdateDrawingData = {
@@ -189,6 +194,10 @@ export type DrawingChangedMessage = {
   type: MessageType.DRAWING_CHANGED;
 };
 
+export type GetThumbnailMessage = {
+  type: MessageType.GET_THUMBNAIL;
+};
+
 export type GetWorkspaceResponse = {
   folders: FolderData[];
   drawings: DrawingData[];
@@ -229,4 +238,5 @@ export type DrawingMessage =
   | UpdateFolderMessage
   | DeleteFolderMessage
   | MoveDrawingMessage
-  | DrawingChangedMessage;
+  | DrawingChangedMessage
+  | GetThumbnailMessage;

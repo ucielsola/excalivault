@@ -3,7 +3,7 @@ import { defineBackground } from "#imports";
 import browser from "webextension-polyfill";
 
 import { captureException, initSentry } from "$lib/services/sentry";
-import { MessageType, type DrawingMessage, type GetDrawingDataResponse } from "$lib/types";
+import { MessageType, type DrawingMessage, type GetDrawingDataResponse, type GetThumbnailResponse } from "$lib/types";
 
 interface SidePanelBrowser {
   sidePanel: {
@@ -493,6 +493,73 @@ export default defineBackground({
                   "excalivault_unsaved_changes": true,
                 })
                 .then(() => ({ success: true }));
+            });
+          }
+
+          if (typedMessage.type === MessageType.GET_THUMBNAIL) {
+            return getActiveTab().then(async (tab: unknown) => {
+              const tabObj = tab as { id?: number };
+              if (!tabObj?.id) {
+                return { thumbnailBase64: null };
+              }
+
+              try {
+                const [result] = await browser.scripting.executeScript({
+                  target: { tabId: tabObj.id },
+                  func: () => {
+                    const canvas = document.querySelector(
+                      "canvas.excalidraw__canvas",
+                    ) as HTMLCanvasElement;
+
+                    if (!canvas) {
+                      return { thumbnailBase64: null };
+                    }
+
+                    const maxwidth = 300;
+                    const aspectRatio = 16 / 9;
+                    const width = Math.min(maxwidth, canvas.width);
+                    const height = Math.round(width / aspectRatio);
+
+                    const tempCanvas = document.createElement("canvas");
+                    tempCanvas.width = width;
+                    tempCanvas.height = height;
+                    const tempCtx = tempCanvas.getContext("2d");
+
+                    if (!tempCtx) {
+                      return { thumbnailBase64: null };
+                    }
+
+                    const scale = Math.min(
+                      width / canvas.width,
+                      height / canvas.height,
+                    );
+                    const scaledWidth = canvas.width * scale;
+                    const scaledHeight = canvas.height * scale;
+                    const offsetX = (width - scaledWidth) / 2;
+                    const offsetY = (height - scaledHeight) / 2;
+
+                    tempCtx.fillStyle = "#ffffff";
+                    tempCtx.fillRect(0, 0, width, height);
+                    tempCtx.drawImage(
+                      canvas,
+                      offsetX,
+                      offsetY,
+                      scaledWidth,
+                      scaledHeight,
+                    );
+
+                    return {
+                      thumbnailBase64: tempCanvas.toDataURL("image/jpeg", 0.7),
+                    };
+                  },
+                });
+                return result.result as GetThumbnailResponse;
+              } catch (error) {
+                console.error("[Excalivault] Failed to capture thumbnail:", error);
+                return { thumbnailBase64: null };
+              }
+            }).catch(() => {
+              return { thumbnailBase64: null };
             });
           }
 

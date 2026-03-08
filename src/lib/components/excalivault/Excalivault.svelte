@@ -50,6 +50,37 @@
   });
 </script>
 
+<AlertContainer />
+
+{#if vaultList.confirmOpenOpen && vaultList.selectedDrawing}
+  <OverwriteConfirmDialog
+    open={vaultList.confirmOpenOpen}
+    drawingName={vaultList.selectedDrawing.name}
+    onConfirm={() => vaultList.confirmOpen()}
+    onCancel={() => vaultList.cancelOpen()}
+  />
+{/if}
+
+{#if vaultList.deleteConfirmOpen && (vaultList.selectedDrawing || vaultList.selectedFolder)}
+  <DeleteConfirmDialog
+    open={vaultList.deleteConfirmOpen}
+    itemName={vaultList.selectedDrawing?.name ??
+      vaultList.selectedFolder?.name ??
+      ""}
+    itemType={vaultList.selectedDrawing ? "drawing" : "folder"}
+    subfolderCount={vaultList.deletingFolderSubfolderCount}
+    subfolderDrawingCount={vaultList.deletingFolderDrawingCount}
+    onConfirm={() =>
+      vaultList.selectedDrawing
+        ? vaultList.confirmDelete()
+        : vaultList.confirmDeleteFolder()}
+    onCancel={() =>
+      vaultList.selectedDrawing
+        ? vaultList.cancelDelete()
+        : vaultList.cancelDeleteFolder()}
+  />
+{/if}
+
 {#if isEmptyVault}
   <WelcomeScreen />
 {:else}
@@ -61,8 +92,6 @@
     </div>
 
     <CurrentDrawing />
-
-    <AlertContainer />
 
     {#if vaultList.savePanelOpen}
       <SavePanel />
@@ -134,34 +163,5 @@
     {/if}
 
     <Footer />
-
-    {#if vaultList.confirmOpenOpen && vaultList.selectedDrawing}
-      <OverwriteConfirmDialog
-        open={vaultList.confirmOpenOpen}
-        drawingName={vaultList.selectedDrawing.name}
-        onConfirm={() => vaultList.confirmOpen()}
-        onCancel={() => vaultList.cancelOpen()}
-      />
-    {/if}
-
-    {#if vaultList.deleteConfirmOpen && (vaultList.selectedDrawing || vaultList.selectedFolder)}
-      <DeleteConfirmDialog
-        open={vaultList.deleteConfirmOpen}
-        itemName={vaultList.selectedDrawing?.name ??
-          vaultList.selectedFolder?.name ??
-          ""}
-        itemType={vaultList.selectedDrawing ? "drawing" : "folder"}
-        subfolderCount={vaultList.deletingFolderSubfolderCount}
-        subfolderDrawingCount={vaultList.deletingFolderDrawingCount}
-        onConfirm={() =>
-          vaultList.selectedDrawing
-            ? vaultList.confirmDelete()
-            : vaultList.confirmDeleteFolder()}
-        onCancel={() =>
-          vaultList.selectedDrawing
-            ? vaultList.cancelDelete()
-            : vaultList.cancelDeleteFolder()}
-      />
-    {/if}
   </div>
 {/if}
