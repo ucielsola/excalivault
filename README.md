@@ -71,3 +71,17 @@ src/
 3. Enable **Developer Mode**
 4. Click **Load unpacked**
 5. Select `.output/chrome-mv3/`
+
+## Documentation
+
+The documentation site is built with Astro and hosted on Vercel.
+
+```bash
+# Start docs dev server
+pnpm docs:dev
+
+# Build docs
+pnpm docs:build
+```
+
+See [docs/README.md](./docs/README.md) for more details.

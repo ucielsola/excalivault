@@ -12,7 +12,9 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "postinstall": "wxt prepare",
-    "clean": "git clean -fXd"
+    "clean": "git clean -fXd",
+    "docs:dev": "pnpm --filter docs dev",
+    "docs:build": "pnpm --filter docs build"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.3",

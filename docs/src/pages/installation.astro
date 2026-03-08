@@ -1,0 +1,98 @@
+---
+title: "Installation"
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <nav class="fixed left-0 top-0 h-full w-64 bg-sidebar border-r border-sidebar-border p-4">
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-sidebar-foreground">Excalivault</h2>
+      <p class="text-sm text-muted-foreground">Documentation</p>
+    </div>
+    <ul class="space-y-2">
+      <li>
+        <a href="/" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          Home
+        </a>
+      </li>
+      <li>
+        <a href="/installation" class="block px-3 py-2 rounded-md bg-sidebar-accent text-sidebar-accent-foreground">
+          Installation
+        </a>
+      </li>
+      <li>
+        <a href="/how-it-works" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          How It Works
+        </a>
+      </li>
+      <li>
+        <a href="/privacy" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          Privacy
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <main class="ml-64 p-8">
+    <h1 class="text-4xl font-bold mb-4">Installation</h1>
+    <p class="text-muted-foreground mb-8">
+      How to install and set up Excalivault Chrome extension
+    </p>
+    <div class="grid gap-6">
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Chrome Web Store</h2>
+        <p class="text-muted-foreground">
+          Excalivault is available on the <a href="#" class="text-primary hover:underline">Chrome Web Store</a>.
+        </p>
+      </section>
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Manual Installation</h2>
+        <p class="text-muted-foreground mb-4">
+          For development or to use the latest version:
+        </p>
+        <ol class="list-decimal pl-5 space-y-2">
+          <li>Download the extension:
+            <pre class="mt-2 bg-muted p-2 rounded text-sm"><code>pnpm build</code></pre>
+          </li>
+          <li>Load in Chrome:
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+              <li>Open <code class="bg-muted px-1 rounded">chrome://extensions</code></li>
+              <li>Enable <strong>Developer Mode</strong></li>
+              <li>Click <strong>Load unpacked</strong></li>
+              <li>Select the <code class="bg-muted px-1 rounded">.output/chrome-mv3/</code> folder</li>
+            </ul>
+          </li>
+          <li>Grant Permissions:
+            <ul class="list-disc pl-5 mt-2 space-y-1">
+              <li><code class="bg-muted px-1 rounded">storage</code> - For saving drawings and folders</li>
+              <li><code class="bg-muted px-1 rounded">sidePanel</code> - For the vault interface</li>
+              <li><code class="bg-muted px-1 rounded">activeTab</code> - For accessing Excalidraw pages</li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">After Installation</h2>
+        <p class="text-muted-foreground mb-4">
+          Once installed:
+        </p>
+        <ol class="list-decimal pl-5 space-y-2">
+          <li>Open the side panel by clicking the Excalivault icon</li>
+          <li>Navigate to <a href="https://excalidraw.com" class="text-primary hover:underline">excalidraw.com</a></li>
+          <li>Create a drawing</li>
+          <li>Click "Save to Vault" in the side panel</li>
+        </ol>
+      </section>
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Screenshots</h2>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-muted border border-border rounded-lg p-4 text-center text-muted-foreground">
+            Main vault interface
+          </div>
+          <div class="bg-muted border border-border rounded-lg p-4 text-center text-muted-foreground">
+            Saving a drawing
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>

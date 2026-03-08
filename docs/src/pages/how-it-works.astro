@@ -1,0 +1,132 @@
+---
+title: "How It Works"
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <nav class="fixed left-0 top-0 h-full w-64 bg-sidebar border-r border-sidebar-border p-4">
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-sidebar-foreground">Excalivault</h2>
+      <p class="text-sm text-muted-foreground">Documentation</p>
+    </div>
+    <ul class="space-y-2">
+      <li>
+        <a href="/" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          Home
+        </a>
+      </li>
+      <li>
+        <a href="/installation" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          Installation
+        </a>
+      </li>
+      <li>
+        <a href="/how-it-works" class="block px-3 py-2 rounded-md bg-sidebar-accent text-sidebar-accent-foreground">
+          How It Works
+        </a>
+      </li>
+      <li>
+        <a href="/privacy" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          Privacy
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <main class="ml-64 p-8">
+    <h1 class="text-4xl font-bold mb-4">How It Works</h1>
+    <p class="text-muted-foreground mb-8">
+      Understanding Excalivault's architecture and data flow
+    </p>
+    <div class="grid gap-6">
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Architecture Overview</h2>
+        <div class="bg-muted border border-border rounded-lg p-4 text-sm font-mono overflow-x-auto whitespace-pre">┌─────────────────────────────────────────────────────────┐
+│     Side Panel (Vault Interface)                         │
+│     - Browse folders                                     │
+│     - View drawings with thumbnails                      │
+│     - Save current Excalidraw drawing                    │
+└─────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────┐
+│     Background Service Worker                           │
+│     - Manages storage operations                        │
+│     - Coordinates between content scripts and UI        │
+│     - Handles folder/drawing CRUD operations             │
+└─────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────┐
+│     Browser Storage (chrome.storage.local)              │
+│     - Stores drawings (elements, appState, thumbnails)   │
+│     - Stores folders (nested structure)                 │
+└─────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────┐
+│     Excalidraw Content Script                           │
+│     - Injects/extracts data from Excalidraw.com        │
+│     - Bridges extension storage and Excalidraw         │
+└─────────────────────────────────────────────────────────┘</div>
+      </section>
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Data Flow</h2>
+        <h3 class="text-xl font-semibold mb-2">Saving a Drawing</h3>
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>You create a drawing on <a href="https://excalidraw.com" class="text-primary hover:underline">excalidraw.com</a></li>
+          <li>Click "Save to Vault" in the side panel</li>
+          <li>The background script reads data from Excalidraw's localStorage</li>
+          <li>Captures a 80x80 thumbnail</li>
+          <li>Stores everything in chrome.storage.local</li>
+          <li>The drawing appears in your vault with a thumbnail</li>
+        </ol>
+        <h3 class="text-xl font-semibold mb-2 mt-6">Loading a Drawing</h3>
+        <ol class="list-decimal pl-5 space-y-1">
+          <li>Click on a saved drawing in the vault</li>
+          <li>The extension stores drawing data in temporary storage</li>
+          <li>Opens a new tab to excalidraw.com</li>
+          <li>The content script injects the data back into Excalidraw</li>
+          <li>Your drawing is restored!</li>
+        </ol>
+      </section>
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Data Structure</h2>
+        <h3 class="text-xl font-semibold mb-2">Folder</h3>
+        <pre class="bg-muted p-4 rounded text-sm overflow-x-auto">&#123;
+  id: string;              // Unique ID
+  name: string;            // Folder title
+  parentId: string | null; // Parent folder (null for root)
+  createdAt: number;       // Timestamp
+  updatedAt: number;       // Timestamp
+&#125;</pre>
+        <h3 class="text-xl font-semibold mb-2 mt-4">Drawing</h3>
+        <pre class="bg-muted p-4 rounded text-sm overflow-x-auto">&#123;
+  id: string;              // Unique ID
+  folderId: string | null; // Parent folder
+  name: string;            // Drawing title
+  elements: string;        // JSON of Excalidraw elements
+  appState: string;        // JSON of Excalidraw app state
+  imageBase64?: string;    // 80x80 thumbnail (PNG)
+  createdAt: number;       // Timestamp
+  updatedAt: number;       // Timestamp
+&#125;</pre>
+      </section>
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Tech Stack</h2>
+        <ul class="list-disc pl-5 space-y-1">
+          <li><strong>WXT</strong> - Web extension framework</li>
+          <li><strong>Svelte 5</strong> - Reactive UI with runes</li>
+          <li><strong>TypeScript</strong> - Type safety</li>
+          <li><strong>Tailwind 4</strong> - Utility-first CSS</li>
+          <li><strong>DaisyUI</strong> - Component library</li>
+        </ul>
+      </section>
+      <section class="bg-card border border-border rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Privacy & Security</h2>
+        <ul class="list-none space-y-1">
+          <li>✅ All data stored locally in your browser</li>
+          <li>✅ No data sent to external servers</li>
+          <li>✅ No tracking or analytics</li>
+          <li>✅ Works offline (once Excalidraw is loaded)</li>
+        </ul>
+      </section>
+    </div>
+  </main>
+</Layout>

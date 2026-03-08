@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd docs && pnpm build",
+  "outputDirectory": "docs/dist",
+  "installCommand": "cd docs && pnpm install",
+  "framework": null,
+  "regions": ["iad1"]
+}
