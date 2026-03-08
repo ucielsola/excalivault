@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Trash2Icon, TriangleAlert } from "@lucide/svelte";
 
-  import { VaultLogo } from "$lib/components/excalivault/shared";
+  import { dialogStore } from "$lib/stores";
   import { Button } from "$lib/components/ui/button";
   import {
     Dialog,
@@ -32,6 +32,12 @@
 
   let phase = $state<"confirm" | "deleted">("confirm");
 
+  function handleOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      dialogStore.close();
+    }
+  }
+
   async function handleConfirm() {
     await onConfirm();
     phase = "deleted";
@@ -46,83 +52,73 @@
   );
 </script>
 
-<div class="flex h-full flex-col">
-  <div
-    class="border-border flex items-center justify-between border-b px-4 py-3"
-  >
-    <VaultLogo size="small" />
-  </div>
-
-  {#if open}
-    <Dialog {open}>
-      <DialogContent class="max-w-75">
-        {#if phase === "confirm"}
-          <DialogHeader>
-            <div class="flex items-center gap-2.5">
-              <div
-                class="bg-destructive/10 flex h-8 w-8 items-center justify-center rounded-md"
-              >
-                <Trash2Icon size={16} class="text-destructive" />
-              </div>
-              <DialogTitle>Delete {itemType}?</DialogTitle>
-            </div>
-          </DialogHeader>
-
-          <div class="space-y-3">
-            <DialogDescription>
-              Are you sure you want to permanently delete
-              <span class="text-foreground font-medium">"{itemName}"</span>
-              ? This action cannot be undone.
-            </DialogDescription>
-            {#if hasSubfolders}
-              <div
-                class="bg-destructive/5 border-destructive/20 flex items-start gap-2 rounded-md border p-3"
-              >
-                <TriangleAlert
-                  size={14}
-                  class="text-destructive mt-0.5 shrink-0"
-                />
-                <div class="space-y-1">
-                  <p class="text-destructive text-[11px] font-medium">
-                    This will also delete:
-                  </p>
-                  <p class="text-muted-foreground text-[11px]">
-                    {subfolderCount > 0 &&
-                      `${subfolderCount} subfolder${subfolderCount > 1 ? "s" : ""}`}
-                    {subfolderCount > 0 && subfolderDrawingCount > 0 && " and "}
-                    {subfolderDrawingCount > 0 &&
-                      `${subfolderDrawingCount} drawing${subfolderDrawingCount > 1 ? "s" : ""}`}
-                  </p>
-                </div>
-              </div>
-            {/if}
+<Dialog {open} onOpenChange={handleOpenChange}>
+  <DialogContent class="max-w-75">
+    {#if phase === "confirm"}
+      <DialogHeader>
+        <div class="flex items-center gap-2.5">
+          <div
+            class="bg-destructive/10 flex h-8 w-8 items-center justify-center rounded-md"
+          >
+            <Trash2Icon size={16} class="text-destructive" />
           </div>
+          <DialogTitle>Delete {itemType}?</DialogTitle>
+        </div>
+      </DialogHeader>
 
-          <DialogFooter>
-            <Button variant="outline" onclick={onCancel}>Keep it</Button>
-            <Button variant="destructive" onclick={handleConfirm}
-              >Delete forever</Button
-            >
-          </DialogFooter>
-        {:else}
-          <div class="flex flex-col items-center gap-3 py-4">
-            <div
-              class="bg-destructive/10 flex h-10 w-10 items-center justify-center rounded-full"
-            >
-              <Trash2Icon size={18} class="text-destructive" />
+      <div class="space-y-3">
+        <DialogDescription>
+          Are you sure you want to permanently delete
+          <span class="text-foreground font-medium">"{itemName}"</span>
+          ? This action cannot be undone.
+        </DialogDescription>
+        {#if hasSubfolders}
+          <div
+            class="bg-destructive/5 border-destructive/20 flex items-start gap-2 rounded-md border p-3"
+          >
+            <TriangleAlert
+              size={14}
+              class="text-destructive mt-0.5 shrink-0"
+            />
+            <div class="space-y-1">
+              <p class="text-destructive text-[11px] font-medium">
+                This will also delete:
+              </p>
+              <p class="text-muted-foreground text-[11px]">
+                {subfolderCount > 0 &&
+                  `${subfolderCount} subfolder${subfolderCount > 1 ? "s" : ""}`}
+                {subfolderCount > 0 && subfolderDrawingCount > 0 && " and "}
+                {subfolderDrawingCount > 0 &&
+                  `${subfolderDrawingCount} drawing${subfolderDrawingCount > 1 ? "s" : ""}`}
+              </p>
             </div>
-            <p class="text-muted-foreground text-xs">
-              {itemType === "drawing" ? "Drawing" : "Folder"} deleted.
-            </p>
-            <button
-              onclick={handleReset}
-              class="text-primary text-[11px] underline underline-offset-2"
-            >
-              Reset demo
-            </button>
           </div>
         {/if}
-      </DialogContent>
-    </Dialog>
-  {/if}
-</div>
+      </div>
+
+      <DialogFooter>
+        <Button variant="outline" onclick={onCancel}>Keep it</Button>
+        <Button variant="destructive" onclick={handleConfirm}
+          >Delete forever</Button
+        >
+      </DialogFooter>
+    {:else}
+      <div class="flex flex-col items-center gap-3 py-4">
+        <div
+          class="bg-destructive/10 flex h-10 w-10 items-center justify-center rounded-full"
+        >
+          <Trash2Icon size={18} class="text-destructive" />
+        </div>
+        <p class="text-muted-foreground text-xs">
+          {itemType === "drawing" ? "Drawing" : "Folder"} deleted.
+        </p>
+        <button
+          onclick={handleReset}
+          class="text-primary text-[11px] underline underline-offset-2"
+        >
+          Reset demo
+        </button>
+      </div>
+    {/if}
+  </DialogContent>
+</Dialog>
