@@ -1,4 +1,3 @@
-export { default as Header } from "./Header.svelte";
 export { default as SearchBar } from "./SearchBar.svelte";
 export { default as FolderItem } from "./FolderItem.svelte";
 export { default as FolderItemDisplay } from "./FolderItemDisplay.svelte";

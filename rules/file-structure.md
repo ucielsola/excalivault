@@ -31,14 +31,20 @@ components/ui/
 
 ### components/excalivault/
 - Domain-specific components
-- Can have subdirectories for features
+- View-level components in root (e.g., `MainView.svelte`, `VaultHeader.svelte`)
+- Subdirectories for features (e.g., `dialogs/`, `list-view/`)
 
 ```bash
 components/excalivault/
-  dialogs/
+  dialogs/              # Dialog components
     DeleteDialog.svelte
     index.ts
-  VaultList.svelte
+  list-view/            # List-related subcomponents
+    SearchBar.svelte
+    VaultListItem.svelte
+    index.ts
+  MainView.svelte       # View-level component (no subdirs)
+  VaultHeader.svelte    # Universal component
   index.ts
 ```
 

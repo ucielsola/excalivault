@@ -12,6 +12,30 @@ Chrome Extension with 3 entrypoints:
 2. **Content Script** (`excalidraw-content/`): Injected into excalidraw.com, monitors canvas changes
 3. **Side Panel** (`sidepanel/`): Svelte app UI for managing drawings/folders
 
+## Component Architecture
+
+**View-Level Components** (`src/lib/components/excalivault/`):
+- `Excalivault.svelte` - Root container with view routing
+- `VaultHeader.svelte` - Universal header (logo, back button, settings)
+- `MainView.svelte` - Main vault view (navigator, current drawing, save actions)
+- `SettingsView.svelte` - Settings view
+- `Footer.svelte` - Universal footer (counters, folder creation)
+
+**Subdirectory Pattern** (`src/lib/components/excalivault/list-view/`):
+- `SearchBar.svelte`, `FolderList.svelte`, `EmptyState.svelte`
+- Item components: `VaultListItem.*`, `FolderItem.*`
+- Action components: rename, move, delete
+
+**Dialogs** (`src/lib/components/excalivault/dialogs/`):
+- Managed by `DialogManager.svelte`
+- Standalone dialogs: `DeleteConfirmDialog`, `OverwriteConfirmDialog`, `FolderSelectDialog`
+- Panels: `SavePanel`, `SaveCurrent`
+
+**View Routing:**
+- Uses `viewStore` to switch between `"main"` and `"settings"`
+- Conditional rendering in `Excalivault.svelte`
+- Header and Footer render unconditionally
+
 # Data Flow
 
 **Save Drawing:**
