@@ -20,10 +20,15 @@ export default defineContentScript({
 
     let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
     const DEBOUNCE_MS = 2000;
+    let lastExcalidrawValue = localStorage.getItem("excalidraw");
 
     function handleInteraction() {
       const currentExcalidrawValue = localStorage.getItem("excalidraw");
-      if (!currentExcalidrawValue) return;
+      if (!currentExcalidrawValue || currentExcalidrawValue === lastExcalidrawValue) {
+        return;
+      }
+
+      lastExcalidrawValue = currentExcalidrawValue;
 
       if (debounceTimeout) {
         clearTimeout(debounceTimeout);
