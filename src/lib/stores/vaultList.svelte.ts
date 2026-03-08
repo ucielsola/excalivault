@@ -23,6 +23,7 @@ class VaultListStore {
   #newCopyInputRef = $state<HTMLInputElement | undefined>(undefined);
   #deletingFolderSubfolderCount = $state(0);
   #deletingFolderDrawingCount = $state(0);
+  #saveFolderId = $state<string | null>(null);
 
   get menuOpenId(): string | null {
     return this.#menuOpenId;
@@ -158,6 +159,14 @@ class VaultListStore {
 
   get deletingFolderDrawingCount(): number {
     return this.#deletingFolderDrawingCount;
+  }
+
+  get saveFolderId(): string | null {
+    return this.#saveFolderId;
+  }
+
+  set saveFolderId(value: string | null) {
+    this.#saveFolderId = value;
   }
 
   get isSearching(): boolean {
@@ -336,6 +345,7 @@ class VaultListStore {
     this.#overwriteTargetId = null;
     this.#newCopyName = "";
     this.#savingState = "idle";
+    this.#saveFolderId = this.#currentFolderId;
   }
 
   closeSavePanel(): void {
@@ -361,6 +371,7 @@ class VaultListStore {
         versionFiles: "",
         versionDataState: "",
         imageBase64: currentData.imageBase64,
+        folderId: this.#saveFolderId,
       });
       this.#savingState = "done";
       setTimeout(() => this.closeSavePanel(), 1200);
@@ -392,20 +403,7 @@ class VaultListStore {
   }
 
   async handleSaveAsNewCopy(): Promise<void> {
-    const currentData = await drawings.getCurrentDrawingData();
-    if (!currentData?.id) return;
-    const newId = `drawing_${Date.now()}`;
-    const newName = `${currentData.title || "Untitled"} (copy)`;
-    await drawings.saveDrawing({
-      id: newId,
-      name: newName,
-      elements: currentData.elements,
-      appState: currentData.appState,
-      versionFiles: "",
-      versionDataState: "",
-      imageBase64: currentData.imageBase64,
-    });
-    alerts.success(`Saved as "${newName}"`);
+    this.openSavePanel("new");
   }
 
   async handleOverwrite(): Promise<void> {

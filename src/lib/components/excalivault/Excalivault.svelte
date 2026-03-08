@@ -104,7 +104,7 @@
                   class="h-7 px-3 text-[11px] font-medium"
                 >
                   <Replace size={12} />
-                  Save as new copy
+                  Save As
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Create a new copy of current drawing</TooltipContent>
