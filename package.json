@@ -1,9 +1,9 @@
 {
   "name": "excalivault",
-  "description": "Personal vault for storing Excalidraws",
+  "description": "A local-first personal vault to organize, search, and manage your Excalidraw sketches.",
   "version": "1.0.0",
   "type": "module",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "wxt",
     "build": "wxt build",
