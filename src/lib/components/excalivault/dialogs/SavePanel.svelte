@@ -9,7 +9,7 @@
     X,
   } from "@lucide/svelte";
 
-  import { drawings, folders, vaultList } from "$lib/stores";
+  import { drawings, folders, vaultActions, vaultList } from "$lib/stores";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
   import FolderSelectDialog from "$lib/components/excalivault/dialogs/FolderSelectDialog.svelte";
 
@@ -25,7 +25,7 @@
   let folderSelectOpen = $state(false);
   let saveFolder = $derived(() => saveFolderId ? folders.folders.find(f => f.id === saveFolderId) : null);
 
-  const handleSave = () => saveMode === "new" ? vaultList.handleSaveNewCopy() : vaultList.handleOverwrite();
+  const handleSave = () => saveMode === "new" ? vaultActions.handleSaveNewCopy() : vaultActions.handleOverwrite();
   const onCancel = () => vaultList.closeSavePanel();
   const handleFolderSelect = (folderId: string | null) => {
     vaultList.saveFolderId = folderId;
@@ -55,8 +55,8 @@
           placeholder="Drawing name..."
           bind:value={vaultList.newCopyName}
           onkeydown={(e) => {
-            if (e.key === "Enter") vaultList.handleSaveNewCopy();
-            if (e.key === "Escape") vaultList.closeSavePanel();
+            if (e.key === "Enter") vaultActions.handleSaveNewCopy();
+            if (e.key === "Escape") vaultActions.closeSavePanel();
           }}
           disabled={savingState !== "idle"}
           class="border-border bg-input text-foreground focus:border-primary focus:ring-primary placeholder:text-muted-foreground/40 rounded-md border px-2.5 py-2 font-mono text-xs focus:ring-1 focus:outline-none disabled:opacity-50"
@@ -80,7 +80,7 @@
           {/if}
         </button>
         <button
-          onclick={() => vaultList.handleSaveNewCopy()}
+          onclick={() => vaultActions.handleSaveNewCopy()}
           disabled={!newCopyName.trim() || savingState !== "idle"}
           class="bg-primary text-primary-foreground flex items-center justify-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition-all hover:brightness-110 disabled:opacity-40"
         >
@@ -154,7 +154,7 @@
           </div>
         {/if}
         <button
-          onclick={() => vaultList.handleOverwrite()}
+          onclick={() => vaultActions.handleOverwrite()}
           disabled={!overwriteTargetId || savingState !== "idle"}
           class="bg-primary text-primary-foreground flex items-center justify-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition-all hover:brightness-110 disabled:opacity-40"
         >

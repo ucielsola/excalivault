@@ -1,5 +1,6 @@
 import { alerts, drawings, folders } from "$lib/stores";
 import { type DrawingData, type FolderData } from "$lib/types";
+import { formatDate } from "$lib/utils/dateFormat";
 
 type SaveMode = "idle" | "new" | "overwrite";
 type SavingState = "idle" | "saving" | "done";
@@ -161,6 +162,11 @@ class VaultListStore {
     return this.#deletingFolderDrawingCount;
   }
 
+  setDeletingFolderCounts(subfolders: number, drawings: number): void {
+    this.#deletingFolderSubfolderCount = subfolders;
+    this.#deletingFolderDrawingCount = drawings;
+  }
+
   get saveFolderId(): string | null {
     return this.#saveFolderId;
   }
@@ -214,11 +220,7 @@ class VaultListStore {
   }
 
   formatDate(timestamp: number): string {
-    const diff = Date.now() - timestamp;
-    if (diff < 3600000) return "Just now";
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)} hours ago`;
-    if (diff < 604800000) return `${Math.floor(diff / 86400000)} days ago`;
-    return new Date(timestamp).toLocaleDateString();
+    return formatDate(timestamp);
   }
 
   drawingsInFolder(folderId: string): DrawingData[] {

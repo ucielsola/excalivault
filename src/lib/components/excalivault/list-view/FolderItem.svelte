@@ -4,7 +4,7 @@ import FolderItemRename from "$lib/components/excalivault/list-view/FolderItemRe
 import FolderItemActions from "$lib/components/excalivault/list-view/FolderItemActions.svelte";
 import FolderCreation from "$lib/components/excalivault/list-view/FolderCreation.svelte";
 import VaultListItem from "$lib/components/excalivault/list-view/VaultListItem.svelte";
-import { folders, vaultList } from "$lib/stores";
+  import { folders, vaultActions, vaultList } from "$lib/stores";
 import { type FolderData } from "$lib/types";
 import FolderItem from "./FolderItem.svelte";
 
@@ -35,8 +35,8 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
           <FolderItemRename
             initial={folder.name}
             onConfirm={(v: string) =>
-              vaultList.handleRenameFolder(folder.id, v)}
-            onCancel={() => vaultList.cancelRename()}
+              vaultActions.handleRenameFolder(folder.id, v)}
+            onCancel={() => vaultActions.cancelRename()}
           />
         {:else}
           <FolderItemDisplay
@@ -46,8 +46,8 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
             {isSelected}
             drawingsCount={totalDrawingsCount}
             {hasContent}
-            onToggle={() => vaultList.toggleFolder(folder.id)}
-            onSelect={() => vaultList.handleFolderClick(folder.id)}
+            onToggle={() => vaultActions.toggleFolder(folder.id)}
+            onSelect={() => vaultActions.handleFolderClick(folder.id)}
           />
         {/if}
       </div>
@@ -58,10 +58,10 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
             folders.expandFolder(folder.id);
             vaultList.creatingSubfolderId = folder.id;
           }}
-          onRename={() => vaultList.startRename(folder.id)}
-          onDelete={() => vaultList.handleDeleteFolder(folder.id)}
+          onRename={() => vaultActions.startRename(folder.id)}
+          onDelete={() => vaultActions.handleDeleteFolder(folder.id)}
           onChangeColor={(color) =>
-            vaultList.handleChangeFolderColor(folder.id, color)}
+            vaultActions.handleChangeFolderColor(folder.id, color)}
           onChangeIcon={(icon) => folders.updateFolderIcon(folder.id, icon)}
         />
       {/if}
@@ -94,7 +94,7 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
         <div class="h-5 w-5 shrink-0"></div>
         <FolderCreation
           onConfirm={(name, color, icon) => {
-            vaultList.handleCreateSubFolder(folder.id, name, color, icon);
+            vaultActions.handleCreateSubFolder(folder.id, name, color, icon);
           }}
           onCancel={() => {
             vaultList.creatingSubfolderId = null;

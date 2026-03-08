@@ -2,7 +2,7 @@
   import { Plus } from "@lucide/svelte";
   import { FolderCreation } from "$lib/components/excalivault/list-view";
   import * as ListView from "$lib/components/excalivault/list-view";
-  import { vaultList } from "$lib/stores";
+  import { vaultActions, vaultList } from "$lib/stores";
 </script>
 
 <div class="flex h-full flex-col overflow-hidden">
@@ -20,7 +20,7 @@
     {#if vaultList.creatingFolder}
       <div class="border-border/50 border-b px-4 py-2.5" onkeydown={(e) => e.stopPropagation()} onclick={(e) => e.stopPropagation()}>
         <FolderCreation
-          onConfirm={(name, color, icon) => vaultList.handleCreateFolder(name, color, icon)}
+          onConfirm={(name, color, icon) => vaultActions.handleCreateFolder(name, color, icon)}
           onCancel={() => (vaultList.creatingFolder = false)}
         />
       </div>

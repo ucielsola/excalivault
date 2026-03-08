@@ -2,7 +2,7 @@
   import VaultListItemActions from "$lib/components/excalivault/list-view/VaultListItemActions.svelte";
   import VaultListItemDisplay from "$lib/components/excalivault/list-view/VaultListItemDisplay.svelte";
   import VaultListItemRename from "$lib/components/excalivault/list-view/VaultListItemRename.svelte";
-  import { drawings, vaultList } from "$lib/stores";
+  import { drawings, vaultActions, vaultList } from "$lib/stores";
   import { type DrawingData } from "$lib/types";
 
   interface Props {
@@ -25,8 +25,8 @@ let isActive = $derived(drawings.activeDrawingId === drawing.id);
       {#if isRenaming}
         <VaultListItemRename
           initial={drawing.name}
-          onConfirm={(name) => vaultList.handleRenameDrawing(drawing.id, name)}
-          onCancel={() => vaultList.cancelRename()}
+          onConfirm={(name) => vaultActions.handleRenameDrawing(drawing.id, name)}
+          onCancel={() => vaultActions.cancelRename()}
         />
         {:else}
           <VaultListItemDisplay
@@ -34,16 +34,16 @@ let isActive = $derived(drawings.activeDrawingId === drawing.id);
             formatDate={vaultList.formatDate}
             {showFolderBadge}
             {isActive}
-            onOpen={() => vaultList.handleOpen(drawing)}
+            onOpen={() => vaultActions.handleOpen(drawing)}
           />
         {/if}
     </div>
 
     {#if !isRenaming}
       <VaultListItemActions
-        onDuplicate={() => vaultList.handleDuplicateDrawing(drawing.id)}
-        onStartRename={() => vaultList.startRename(drawing.id)}
-        onDelete={() => vaultList.handleDelete(drawing.id)}
+        onDuplicate={() => vaultActions.handleDuplicateDrawing(drawing.id)}
+        onStartRename={() => vaultActions.startRename(drawing.id)}
+        onDelete={() => vaultActions.handleDelete(drawing.id)}
         drawingId={drawing.id}
         currentFolderId={drawing.folderId}
       />
