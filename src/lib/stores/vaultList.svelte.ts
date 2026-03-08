@@ -286,7 +286,10 @@ class VaultListStore {
   }
 
   async handleCreateFolder(name: string, color?: string, icon?: string): Promise<void> {
-    await folders.createFolder(name, null, color, icon);
+    if (this.#currentFolderId) {
+      folders.toggleFolder(this.#currentFolderId);
+    }
+    await folders.createFolder(name, this.#currentFolderId, color, icon);
     this.#creatingFolder = false;
   }
 

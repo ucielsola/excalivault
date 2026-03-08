@@ -45,7 +45,7 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
             drawingsCount={totalDrawingsCount}
             {hasContent}
             onToggle={() => vaultList.toggleFolder(folder.id)}
-            onSelect={() => vaultList.handleSelectFolder(folder.id)}
+            onSelect={() => vaultList.toggleFolder(folder.id)}
           />
         {/if}
       </div>
