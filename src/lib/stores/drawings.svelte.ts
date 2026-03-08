@@ -5,12 +5,49 @@ import {
   type GetDrawingDataResponse,
   type SaveDrawingData,
 } from "$lib/types";
+import browser from "webextension-polyfill";
 
 class DrawingsStore {
   #loading = $state<boolean>(false);
   #error = $state<string | null>(null);
   #list = $state<DrawingData[]>([]);
   #search = $state<string>("");
+  #hasUnsavedChanges = $state<boolean>(false);
+
+  constructor() {
+    console.log("[DrawingsStore] Constructor called");
+    this.setupStorageListener();
+    console.log("[DrawingsStore] Storage listener setup complete");
+    this.loadUnsavedState();
+    console.log("[DrawingsStore] Initial load complete, hasUnsavedChanges:", this.#hasUnsavedChanges);
+  }
+
+  private async loadUnsavedState(): Promise<void> {
+    try {
+      console.log("[DrawingsStore] Loading initial unsaved state from storage");
+      const result = await browser.storage.local.get(
+        "excalivault_unsaved_changes",
+      );
+      console.log("[DrawingsStore] Storage result:", result);
+      this.#hasUnsavedChanges =
+        (result.excalivault_unsaved_changes as boolean) ?? false;
+      console.log("[DrawingsStore] Initial hasUnsavedChanges:", this.#hasUnsavedChanges);
+    } catch (e) {
+      console.error("[DrawingsStore] Failed to load unsaved state:", e);
+    }
+  }
+
+  private setupStorageListener(): void {
+    browser.storage.onChanged.addListener((changes, areaName) => {
+      console.log("[DrawingsStore] Storage changed, areaName:", areaName, "changes:", changes);
+      
+      if (areaName === "local" && "excalivault_unsaved_changes" in changes) {
+        const newValue = (changes.excalivault_unsaved_changes.newValue as boolean) ?? false;
+        console.log("[DrawingsStore] excalivault_unsaved_changes changed:", this.#hasUnsavedChanges, "->", newValue);
+        this.#hasUnsavedChanges = newValue;
+      }
+    });
+  }
 
   public async loadDrawings(): Promise<void> {
     this.#loading = true;
@@ -54,8 +91,11 @@ class DrawingsStore {
     this.#error = null;
 
     try {
+      console.log("[DrawingsStore] Saving drawing, clearing unsaved changes");
       await drawingService.saveDrawing(data);
       await this.loadDrawings();
+      this.#hasUnsavedChanges = false;
+      console.log("[DrawingsStore] hasUnsavedChanges set to false after save");
     } catch (e) {
       this.#error = "Failed to save drawing";
       captureException(e as Error);
@@ -99,7 +139,10 @@ class DrawingsStore {
 
   public async openDrawing(drawing: DrawingData): Promise<void> {
     try {
+      console.log("[DrawingsStore] Opening drawing, clearing unsaved changes");
       await drawingService.openDrawing(drawing);
+      this.#hasUnsavedChanges = false;
+      console.log("[DrawingsStore] hasUnsavedChanges set to false after open");
     } catch (e) {
       this.#error = "Failed to open drawing";
       captureException(e as Error);
@@ -188,6 +231,10 @@ class DrawingsStore {
     return this.#list.filter((d) => d.name.toLowerCase().includes(query));
   }
 
+  get hasUnsavedChanges(): boolean {
+    return this.#hasUnsavedChanges;
+  }
+
   getDrawingsInFolder(folderId: string | null): DrawingData[] {
     return this.#list.filter((d) => d.folderId === folderId);
   }
@@ -195,6 +242,34 @@ class DrawingsStore {
   getRootDrawings(): DrawingData[] {
     return this.getDrawingsInFolder(null);
   }
+
+  // DEBUG: Function to test storage changes manually
+  public async testUnsavedChanges(): Promise<void> {
+    console.log("[DrawingsStore] DEBUG: Manually setting unsaved changes");
+    await browser.storage.local.set({
+      "excalivault_unsaved_changes": true,
+    });
+    console.log("[DrawingsStore] DEBUG: Set excalivault_unsaved_changes = true");
+  }
+
+  // DEBUG: Function to clear unsaved changes manually
+  public async clearUnsavedChanges(): Promise<void> {
+    console.log("[DrawingsStore] DEBUG: Manually clearing unsaved changes");
+    await browser.storage.local.set({
+      "excalivault_unsaved_changes": false,
+    });
+    console.log("[DrawingsStore] DEBUG: Set excalivault_unsaved_changes = false");
+  }
 }
 
 export const drawings = new DrawingsStore();
+console.log("[DrawingsStore] DrawingsStore instance created");
+
+// DEBUG: Make available in console for testing
+if (typeof window !== "undefined") {
+  (window as any).testUnsavedChanges = () => drawings.testUnsavedChanges();
+  (window as any).clearUnsavedChanges = () => drawings.clearUnsavedChanges();
+  console.log("[DrawingsStore] DEBUG: Added test functions to window:");
+  console.log("[DrawingsStore]   - testUnsavedChanges(): Manually set unsaved changes");
+  console.log("[DrawingsStore]   - clearUnsavedChanges(): Manually clear unsaved changes");
+}

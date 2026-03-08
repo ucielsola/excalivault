@@ -28,6 +28,8 @@ export default defineBackground({
     migrateDrawings();
     migrateFolders();
 
+    console.log("[Excalivault Background] Starting background script");
+
     (browser as unknown as SidePanelBrowser).sidePanel.setPanelBehavior({
       openPanelOnActionClick: true,
     });
@@ -108,12 +110,15 @@ export default defineBackground({
 
     browser.runtime.onMessage.addListener(
       (message: unknown, _sender: browser.Runtime.MessageSender) => {
+        console.log("[Excalivault Background] Received message:", message);
         try {
           if (!message || typeof message !== "object" || !("type" in message)) {
+            console.log("[Excalivault Background] Invalid message, ignoring");
             return Promise.resolve(null);
           }
 
           const typedMessage = message as DrawingMessage;
+          console.log("[Excalivault Background] Processing message type:", typedMessage.type);
 
           if (typedMessage.type === MessageType.GET_ALL_DRAWINGS) {
             return getDrawings().then((drawings) => ({ drawings }));
@@ -169,6 +174,11 @@ export default defineBackground({
               }
 
               await saveDrawings(drawings);
+              console.log("[Excalivault Background] Drawing saved, clearing unsaved changes flag");
+              await browser.storage.local.set({
+                "excalivault_unsaved_changes": false,
+              });
+              console.log("[Excalivault Background] Set excalivault_unsaved_changes = false");
               return { success: true, drawings };
             });
           }
@@ -403,6 +413,18 @@ export default defineBackground({
                 await browser.tabs.create({
                   url: "https://excalidraw.com/",
                 });
+                return { success: true };
+              });
+          }
+
+          if (typedMessage.type === MessageType.DRAWING_CHANGED) {
+            console.log("[Excalivault Background] Received DRAWING_CHANGED message");
+            return browser.storage.local
+              .set({
+                "excalivault_unsaved_changes": true,
+              })
+              .then(() => {
+                console.log("[Excalivault Background] Set excalivault_unsaved_changes = true");
                 return { success: true };
               });
           }

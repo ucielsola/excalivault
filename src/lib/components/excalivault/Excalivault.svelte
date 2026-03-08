@@ -50,30 +50,40 @@
 
     <CurrentDrawing />
 
-    {#if vaultList.savePanelOpen}
+      {#if vaultList.savePanelOpen}
       <SavePanel />
-    {:else}
+      {:else}
       <div class="border-border border-t">
         <div
-          class="border-border/50 flex items-center gap-2 border-b px-4 py-2.5"
+          class="border-border/50 flex items-center justify-between border-b px-4 py-2.5"
         >
-          <button
-            onclick={() => vaultList.openSavePanel("new")}
-            class="bg-primary text-primary-foreground flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-[11px] font-semibold transition-all hover:brightness-110"
-          >
-            <Save size={12} />
-            Save new copy
-          </button>
-          <button
-            onclick={() => vaultList.openSavePanel("overwrite")}
-            class="bg-secondary text-foreground hover:border-primary/30 hover:bg-secondary/80 border-border flex flex-1 items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-[11px] font-medium transition-colors"
-          >
-            <Replace size={12} />
-            Overwrite
-          </button>
+          <div class="flex items-center gap-2">
+            <button
+              onclick={() => vaultList.openSavePanel("new")}
+              class="bg-primary text-primary-foreground flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-[11px] font-semibold transition-all hover:brightness-110"
+            >
+              <Save size={12} />
+              Save new copy
+            </button>
+            <button
+              onclick={() => vaultList.openSavePanel("overwrite")}
+              class="bg-secondary text-foreground hover:border-primary/30 hover:bg-secondary/80 border-border flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-[11px] font-medium transition-colors"
+            >
+              <Replace size={12} />
+              Overwrite
+            </button>
+          </div>
+          {#if drawings.hasUnsavedChanges}
+            <div
+              class="text-destructive bg-destructive/10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-destructive"></span>
+              Unsaved changes
+            </div>
+          {/if}
         </div>
       </div>
-    {/if}
+      {/if}
 
     <Footer />
 

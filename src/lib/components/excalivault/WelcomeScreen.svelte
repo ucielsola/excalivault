@@ -107,10 +107,20 @@
         Checking...
       </Button>
     {:else if browserTab.isExcalidraw}
-      <Button variant="default" class="gap-2" onclick={handleOpenSaveDialog}>
-        <SaveIcon size={14} />
-        Save to Vault
-      </Button>
+      <div class="flex flex-col items-center gap-3">
+        <Button variant="default" class="gap-2" onclick={handleOpenSaveDialog}>
+          <SaveIcon size={14} />
+          Save to Vault
+        </Button>
+        {#if drawings.hasUnsavedChanges}
+          <div
+            class="text-destructive bg-destructive/10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium"
+          >
+            <span class="h-1.5 w-1.5 rounded-full bg-destructive"></span>
+            Unsaved changes
+          </div>
+        {/if}
+      </div>
     {:else}
       <Button
         variant="outline"

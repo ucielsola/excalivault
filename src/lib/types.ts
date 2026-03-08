@@ -43,6 +43,7 @@ export enum MessageType {
   UPDATE_FOLDER = "UPDATE_FOLDER",
   DELETE_FOLDER = "DELETE_FOLDER",
   MOVE_DRAWING = "MOVE_DRAWING",
+  DRAWING_CHANGED = "DRAWING_CHANGED",
 }
 
 export type GetDrawingDataMessage = {
@@ -177,6 +178,10 @@ export type MoveDrawingMessage = {
   };
 };
 
+export type DrawingChangedMessage = {
+  type: MessageType.DRAWING_CHANGED;
+};
+
 export type GetWorkspaceResponse = {
   folders: FolderData[];
   drawings: DrawingData[];
@@ -216,4 +221,5 @@ export type DrawingMessage =
   | CreateFolderMessage
   | UpdateFolderMessage
   | DeleteFolderMessage
-  | MoveDrawingMessage;
+  | MoveDrawingMessage
+  | DrawingChangedMessage;
