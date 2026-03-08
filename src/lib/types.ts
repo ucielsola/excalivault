@@ -10,6 +10,7 @@ export interface FolderData {
   name: string;
   parentId: string | null;
   color: string;
+  icon?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -151,6 +152,7 @@ export type CreateFolderMessage = {
     name: string;
     parentId?: string | null;
     color: string;
+    icon?: string;
   };
 };
 
@@ -160,6 +162,7 @@ export type UpdateFolderMessage = {
     id: string;
     name: string;
     color?: string;
+    icon?: string;
   };
 };
 

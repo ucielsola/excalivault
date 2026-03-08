@@ -193,6 +193,7 @@ export default defineBackground({
               name: string;
               parentId?: string | null;
               color?: string;
+              icon?: string;
             };
 
             return getFolders().then(async (folders: unknown[]) => {
@@ -202,6 +203,7 @@ export default defineBackground({
                 name: payload.name,
                 parentId: payload.parentId ?? null,
                 color: payload.color,
+                icon: payload.icon,
                 createdAt: now,
                 updatedAt: now,
               };
@@ -216,6 +218,7 @@ export default defineBackground({
               id: string;
               name: string;
               color?: string;
+              icon?: string;
             };
 
             return getFolders().then(async (folders: unknown[]) => {
@@ -231,6 +234,9 @@ export default defineBackground({
               };
               if (payload.color !== undefined) {
                 updates.color = payload.color;
+              }
+              if (payload.icon !== undefined) {
+                updates.icon = payload.icon;
               }
               (folders as Array<Record<string, unknown>>)[index] = {
                 ...(folders[index] as object),

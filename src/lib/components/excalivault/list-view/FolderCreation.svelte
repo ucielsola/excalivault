@@ -1,16 +1,22 @@
 <script lang="ts">
-  import { FolderOpen, Check, X } from "@lucide/svelte";
+  import { Check, X } from "@lucide/svelte";
+  import IconRenderer from "$lib/components/ui/IconRenderer.svelte";
   import { COLOR_VALUES, FOLDER_COLORS, getFolderBadgeClass } from "$lib/utils/folderColors";
   import type { FolderColorValue } from "$lib/utils/folderColors";
+  import { DEFAULT_FOLDER_ICON } from "$lib/utils/folderIcons";
   import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
   } from "$lib/components/ui/dropdown-menu";
+  import IconPickerDialog from "$lib/components/ui/IconPickerDialog.svelte";
 
   interface Props {
-    onConfirm: (name: string, color: string) => void;
+    onConfirm: (name: string, color: string, icon?: string) => void;
     onCancel: () => void;
   }
 
@@ -18,10 +24,13 @@
 
   let name = $state("");
   let color = $state(COLOR_VALUES[Math.floor(Math.random() * COLOR_VALUES.length)] as FolderColorValue);
+  let icon = $state(DEFAULT_FOLDER_ICON);
   let inputRef = $state<HTMLInputElement>();
   let ignoreBlur = $state(false);
   let colorMenuOpen = $state(false);
+  let iconPickerOpen = $state(false);
   let justChangedColor = $state(false);
+  let justChangedIcon = $state(false);
 
   $effect(() => {
     if (inputRef) {
@@ -37,7 +46,7 @@
   function handleKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && name.trim()) {
       ignoreBlur = true;
-      onConfirm(name.trim(), color);
+      onConfirm(name.trim(), color, icon);
     }
     if (e.key === "Escape") {
       onCancel();
@@ -45,13 +54,14 @@
   }
 
   function handleBlur() {
-    if (ignoreBlur || justChangedColor) {
+    if (ignoreBlur || justChangedColor || justChangedIcon) {
       ignoreBlur = false;
       justChangedColor = false;
+      justChangedIcon = false;
       return;
     }
     if (name.trim()) {
-      onConfirm(name.trim(), color);
+      onConfirm(name.trim(), color, icon);
     } else {
       onCancel();
     }
@@ -66,10 +76,16 @@
     ignoreBlur = false;
   }
 
+  function handleIconPickerMouseDown(e: MouseEvent) {
+    e.preventDefault();
+    ignoreBlur = true;
+    iconPickerOpen = true;
+  }
+
   function handleConfirm() {
     if (name.trim()) {
       ignoreBlur = true;
-      onConfirm(name.trim(), color);
+      onConfirm(name.trim(), color, icon);
     }
   }
 
@@ -79,12 +95,21 @@
     colorMenuOpen = false;
     setTimeout(() => inputRef?.focus(), 0);
   }
+
+  function handleIconChange(newIcon: string) {
+    justChangedIcon = true;
+    icon = newIcon;
+    iconPickerOpen = false;
+    setTimeout(() => inputRef?.focus(), 0);
+  }
 </script>
 
 <div class="flex items-center gap-2">
-  <FolderOpen
+  <IconRenderer
+    name={icon}
     size={14}
     class={getFolderBadgeClass(color) + " shrink-0"}
+    color={color}
   />
   <input
     bind:this={inputRef}
@@ -94,6 +119,15 @@
     placeholder="Folder name..."
     class="border-primary/40 bg-input text-foreground focus:ring-primary min-w-0 flex-1 rounded border px-1.5 py-0.5 font-mono text-[11px] focus:ring-1 focus:outline-none"
   />
+  <button
+    onmousedown={handleIconPickerMouseDown}
+    aria-label="Choose folder icon"
+    class="border-border hover:border-primary/50 flex h-5 w-5 items-center justify-center rounded border transition-colors"
+  >
+    <div class="flex h-3 w-3 items-center justify-center">
+      <IconRenderer name={icon} size={12} />
+    </div>
+  </button>
   <DropdownMenu bind:open={colorMenuOpen}>
     <DropdownMenuTrigger>
       <button
@@ -138,3 +172,9 @@
     <X size={11} />
   </button>
 </div>
+
+<IconPickerDialog
+  bind:open={iconPickerOpen}
+  onSelect={handleIconChange}
+  onClose={() => iconPickerOpen = false}
+/>

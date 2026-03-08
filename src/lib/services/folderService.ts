@@ -26,10 +26,11 @@ class FolderService {
     name: string,
     parentId: string | null = null,
     color: string,
+    icon?: string,
   ): Promise<CreateFolderResponse> {
     return this.sendMessage<CreateFolderResponse>({
       type: MessageType.CREATE_FOLDER,
-      payload: { name, parentId, color },
+      payload: { name, parentId, color, icon },
     });
   }
 
@@ -37,10 +38,11 @@ class FolderService {
     id: string,
     name: string,
     color?: string,
+    icon?: string,
   ): Promise<UpdateFolderResponse> {
     return this.sendMessage<UpdateFolderResponse>({
       type: MessageType.UPDATE_FOLDER,
-      payload: { id, name, color },
+      payload: { id, name, color, icon },
     });
   }
 

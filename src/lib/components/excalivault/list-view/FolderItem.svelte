@@ -59,6 +59,7 @@ let hasContent = $derived(folderDrawings.length > 0 || childFolders.length > 0);
           onDelete={() => vaultList.handleDeleteFolder(folder.id)}
           onChangeColor={(color) =>
             vaultList.handleChangeFolderColor(folder.id, color)}
+          onChangeIcon={(icon) => folders.updateFolderIcon(folder.id, icon)}
         />
       {/if}
     </div>
@@ -89,8 +90,8 @@ let hasContent = $derived(folderDrawings.length > 0 || childFolders.length > 0);
       <div class="flex items-center gap-2 px-4 py-2.5">
         <div class="h-5 w-5 shrink-0"></div>
         <FolderCreation
-          onConfirm={(name, color) => {
-            vaultList.handleCreateSubFolder(folder.id, name, color);
+          onConfirm={(name, color, icon) => {
+            vaultList.handleCreateSubFolder(folder.id, name, color, icon);
           }}
           onCancel={() => {
             vaultList.creatingSubfolderId = null;

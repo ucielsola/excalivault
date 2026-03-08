@@ -276,13 +276,13 @@ class VaultListStore {
     this.#currentFolderId = null;
   }
 
-  async handleCreateFolder(name: string, color?: string): Promise<void> {
-    await folders.createFolder(name, null, color);
+  async handleCreateFolder(name: string, color?: string, icon?: string): Promise<void> {
+    await folders.createFolder(name, null, color, icon);
     this.#creatingFolder = false;
   }
 
-  async handleCreateSubFolder(parentId: string, name: string, color?: string): Promise<void> {
-    await folders.createFolder(name, parentId, color);
+  async handleCreateSubFolder(parentId: string, name: string, color?: string, icon?: string): Promise<void> {
+    await folders.createFolder(name, parentId, color, icon);
     this.#creatingSubfolderId = null;
   }
 

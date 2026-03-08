@@ -30,6 +30,7 @@ class FoldersStore {
     name: string,
     parentId: string | null = null,
     color?: string,
+    icon?: string,
   ): Promise<void> {
     const folderColor =
       color ?? COLOR_VALUES[this.#folders.length % COLOR_VALUES.length];
@@ -40,6 +41,7 @@ class FoldersStore {
       name,
       parentId,
       color: folderColor,
+      icon,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -48,7 +50,7 @@ class FoldersStore {
     this.#error = null;
 
     try {
-      const response = await folderService.createFolder(name, parentId, folderColor);
+      const response = await folderService.createFolder(name, parentId, folderColor, icon);
       this.#folders = response.folders;
     } catch (e) {
       this.#folders = this.#folders.filter((f) => f.id !== tempId);
@@ -57,23 +59,26 @@ class FoldersStore {
     }
   }
 
-  public async updateFolder(id: string, name: string, color?: string): Promise<void> {
+  public async updateFolder(id: string, name: string, color?: string, icon?: string): Promise<void> {
     const folder = this.#folders.find((f) => f.id === id);
     if (!folder) return;
 
     const originalName = folder.name;
     const originalColor = folder.color;
+    const originalIcon = folder.icon;
     folder.name = name;
     if (color) folder.color = color;
+    if (icon !== undefined) folder.icon = icon;
     this.#folders = [...this.#folders];
     this.#error = null;
 
     try {
-      const response = await folderService.updateFolder(id, name, color);
+      const response = await folderService.updateFolder(id, name, color, icon);
       this.#folders = response.folders;
     } catch (e) {
       folder.name = originalName;
       folder.color = originalColor;
+      folder.icon = originalIcon;
       this.#folders = [...this.#folders];
       this.#error = "Failed to update folder";
       captureException(e as Error);
@@ -92,12 +97,34 @@ class FoldersStore {
     this.#error = null;
 
     try {
-      const response = await folderService.updateFolder(id, folder.name, color);
+      const response = await folderService.updateFolder(id, folder.name, color, folder.icon);
       this.#folders = response.folders;
     } catch (e) {
       folder.color = originalColor;
       this.#folders = [...this.#folders];
       this.#error = "Failed to update folder color";
+      captureException(e as Error);
+    }
+  }
+
+  public async updateFolderIcon(id: string, icon: string): Promise<void> {
+    const folder = this.#folders.find((f) => f.id === id);
+    if (!folder) {
+      return;
+    }
+
+    const originalIcon = folder.icon;
+    folder.icon = icon;
+    this.#folders = [...this.#folders];
+    this.#error = null;
+
+    try {
+      const response = await folderService.updateFolder(id, folder.name, folder.color, icon);
+      this.#folders = response.folders;
+    } catch (e) {
+      folder.icon = originalIcon;
+      this.#folders = [...this.#folders];
+      this.#error = "Failed to update folder icon";
       captureException(e as Error);
     }
   }

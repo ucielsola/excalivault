@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { ChevronDown, ChevronRight, FolderOpen } from "@lucide/svelte";
+  import { ChevronDown, ChevronRight } from "@lucide/svelte";
+  import IconRenderer from "$lib/components/ui/IconRenderer.svelte";
   import { type FolderData } from "$lib/types";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
 
@@ -50,7 +51,12 @@
     onclick={onSelect}
     class="text-foreground hover:text-primary flex min-w-0 flex-1 items-center gap-2 text-left"
   >
-    <FolderOpen size={14} class={folderBadgeClass + " shrink-0"} />
+    <IconRenderer
+      name={folder.icon || "FolderOpen"}
+      size={14}
+      class={folderBadgeClass + " shrink-0"}
+      color={folder.color}
+    />
 
     <span class="truncate text-xs font-medium">{folder.name}</span>
 

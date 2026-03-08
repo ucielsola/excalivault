@@ -20,7 +20,7 @@
     {#if vaultList.creatingFolder}
       <div class="border-border/50 border-b px-4 py-2.5">
         <FolderCreation
-          onConfirm={(name, color) => vaultList.handleCreateFolder(name, color)}
+          onConfirm={(name, color, icon) => vaultList.handleCreateFolder(name, color, icon)}
           onCancel={() => (vaultList.creatingFolder = false)}
         />
       </div>

@@ -5,6 +5,7 @@
     Palette,
     Pencil,
     Trash2,
+    Layers,
   } from "@lucide/svelte";
 
   import {
@@ -18,12 +19,14 @@
     DropdownMenuTrigger,
   } from "$lib/components/ui/dropdown-menu";
   import { FOLDER_COLORS } from "$lib/utils/folderColors";
+  import IconPickerDialog from "$lib/components/ui/IconPickerDialog.svelte";
 
   interface Props {
     onCreateSubfolder: () => void;
     onRename: () => void;
     onDelete: () => void;
     onChangeColor: (color: string) => void;
+    onChangeIcon: (icon: string) => void;
   }
 
   let {
@@ -31,7 +34,10 @@
     onRename,
     onDelete,
     onChangeColor,
+    onChangeIcon,
   }: Props = $props();
+
+  let iconPickerOpen = $state(false);
 </script>
 
 <DropdownMenu>
@@ -43,6 +49,10 @@
     </button>
   </DropdownMenuTrigger>
   <DropdownMenuContent class="w-48" align="end">
+    <DropdownMenuItem onclick={() => iconPickerOpen = true}>
+      <Layers size={11} />
+      Change icon
+    </DropdownMenuItem>
     <DropdownMenuSub>
       <DropdownMenuSubTrigger>
         <Palette size={11} />
@@ -81,3 +91,9 @@
     </DropdownMenuItem>
   </DropdownMenuContent>
 </DropdownMenu>
+
+<IconPickerDialog
+  bind:open={iconPickerOpen}
+  onSelect={onChangeIcon}
+  onClose={() => iconPickerOpen = false}
+/>
