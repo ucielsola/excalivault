@@ -1,10 +1,13 @@
 <script lang="ts">
   import { Replace, Save } from "@lucide/svelte";
 
-  import AlertContainer from "$lib/components/AlertContainer.svelte";
-  import ExcalivaultContainer from "$lib/components/excalivault/ExcalivaultContainer.svelte";
+  import AlertContainer from "$lib/components/excalivault/AlertContainer.svelte";
   import CurrentDrawing from "$lib/components/excalivault/CurrentDrawing.svelte";
-  import { DialogManager, SavePanel } from "$lib/components/excalivault/dialogs";
+  import {
+    DialogManager,
+    SavePanel,
+  } from "$lib/components/excalivault/dialogs";
+  import ExcalivaultContainer from "$lib/components/excalivault/ExcalivaultContainer.svelte";
   import Footer from "$lib/components/excalivault/Footer.svelte";
   import * as ListView from "$lib/components/excalivault/list-view";
   import VaultLayout from "$lib/components/excalivault/VaultLayout.svelte";
