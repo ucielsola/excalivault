@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    Check,
     ChevronDown,
     FolderOpen,
     FolderX,
@@ -9,9 +10,9 @@
     X,
   } from "@lucide/svelte";
 
+  import FolderSelectDialog from "$lib/components/excalivault/dialogs/FolderSelectDialog.svelte";
   import { drawings, folders, vaultActions, vaultList } from "$lib/stores";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
-  import FolderSelectDialog from "$lib/components/excalivault/dialogs/FolderSelectDialog.svelte";
 
   let savePanelOpen = $derived(vaultList.savePanelOpen);
   let saveMode = $derived(vaultList.saveMode);
@@ -23,9 +24,14 @@
   let saveFolderId = $derived(vaultList.saveFolderId);
 
   let folderSelectOpen = $state(false);
-  let saveFolder = $derived(() => saveFolderId ? folders.folders.find(f => f.id === saveFolderId) : null);
+  let saveFolder = $derived(() =>
+    saveFolderId ? folders.folders.find((f) => f.id === saveFolderId) : null,
+  );
 
-  const handleSave = () => saveMode === "new" ? vaultActions.handleSaveNewCopy() : vaultActions.handleOverwrite();
+  const handleSave = () =>
+    saveMode === "new"
+      ? vaultActions.handleSaveNewCopy()
+      : vaultActions.handleOverwrite();
   const onCancel = () => vaultList.closeSavePanel();
   const handleFolderSelect = (folderId: string | null) => {
     vaultList.saveFolderId = folderId;
@@ -62,7 +68,7 @@
           class="border-border bg-input text-foreground focus:border-primary focus:ring-primary placeholder:text-muted-foreground/40 rounded-md border px-2.5 py-2 font-mono text-xs focus:ring-1 focus:outline-none disabled:opacity-50"
         />
         <button
-          onclick={() => folderSelectOpen = true}
+          onclick={() => (folderSelectOpen = true)}
           disabled={savingState !== "idle"}
           class="text-muted-foreground hover:text-foreground hover:bg-secondary flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-left transition-colors disabled:opacity-50"
         >
@@ -89,7 +95,7 @@
               class="border-primary-foreground/30 border-t-primary-foreground h-3.5 w-3.5 animate-spin rounded-full border-2"
             ></div>
           {:else if savingState === "done"}
-            <X size={13} />
+            <Check size={13} />
             Saved!
           {:else}
             <Save size={13} />
@@ -178,6 +184,6 @@
     open={folderSelectOpen}
     currentFolderId={saveFolderId}
     onMove={handleFolderSelect}
-    onCancel={() => folderSelectOpen = false}
+    onCancel={() => (folderSelectOpen = false)}
   />
 {/if}

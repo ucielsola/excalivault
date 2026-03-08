@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Check } from "@lucide/svelte";
   import AlertTriangleIcon from "@lucide/svelte/icons/alert-triangle";
   import SaveIcon from "@lucide/svelte/icons/save";
 
@@ -114,15 +115,7 @@
             ></div>
             Saving...
           {:else if saved}
-            <svg viewBox="0 0 16 16" fill="none" class="mr-2 h-3.5 w-3.5">
-              <path
-                d="M3 8.5L6.5 12L13 4"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <Check size={14} class="mr-2" />
             Saved!
           {:else}
             <SaveIcon size={14} class="mr-2" />
