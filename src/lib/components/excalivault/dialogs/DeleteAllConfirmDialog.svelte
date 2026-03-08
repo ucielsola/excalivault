@@ -35,6 +35,12 @@
     confirmText = "";
   };
 
+  $effect(() => {
+    if (open) {
+      handleReset();
+    }
+  });
+
   async function handleConfirm() {
     await onConfirm();
     phase = "deleted";

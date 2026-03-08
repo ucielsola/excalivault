@@ -447,10 +447,10 @@ dialogStore.open("delete", onConfirm, onCancel, { itemName });
    ```svelte
    <Button onclick={handleSave} disabled={!name.trim() || isSaving}>
      {#if isSaving}
-       <div class="animate-spin ..."></div>
-       Saving...
+         <div class="animate-spin ..."></div>
+         Saving...
      {:else}
-       Save
+         Save
      {/if}
    </Button>
    ```
@@ -471,6 +471,22 @@ dialogStore.open("delete", onConfirm, onCancel, { itemName });
    - `DialogContent` for proper spacing and overflow
    - `DialogHeader` for consistent header layout
    - `DialogFooter` for button alignment
+
+9. **Reset State on Open** - Always reset local dialog state when `open` prop changes to `true`:
+   ```typescript
+   $effect(() => {
+     if (open) {
+       handleReset();  // Reset phase, inputs, etc.
+     }
+   });
+
+   let handleReset = () => {
+     phase = "confirm";
+     confirmText = "";
+   };
+   ```
+   **CRITICAL**: This prevents bugs where dialog reopens with stale state from previous session
+
 
 ---
 
