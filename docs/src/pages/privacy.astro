@@ -1,38 +1,47 @@
 ---
 title: "Privacy"
 import Layout from '../layouts/Layout.astro';
+import { Home, Download, Cpu, ShieldCheck } from '@lucide/astro';
 ---
 
 <Layout>
   <nav class="fixed left-0 top-0 h-full w-64 bg-sidebar border-r border-sidebar-border p-4">
     <div class="mb-8">
-      <h2 class="text-xl font-bold text-sidebar-foreground">Excalivault</h2>
+      <div class="flex items-center gap-2 mb-1">
+        <img src="/icon.png" alt="Excalivault" class="w-8 h-8" />
+        <h2 class="text-xl font-bold text-sidebar-foreground">Excalivault</h2>
+      </div>
       <p class="text-sm text-muted-foreground">Documentation</p>
     </div>
     <ul class="space-y-2">
       <li>
-        <a href="/" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+        <a href="/" class="flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          <Home class="w-4 h-4" />
           Home
         </a>
       </li>
       <li>
-        <a href="/installation" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+        <a href="/installation" class="flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          <Download class="w-4 h-4" />
           Installation
         </a>
       </li>
       <li>
-        <a href="/how-it-works" class="block px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+        <a href="/how-it-works" class="flex items-center gap-3 px-3 py-2 rounded-md text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          <Cpu class="w-4 h-4" />
           How It Works
         </a>
       </li>
       <li>
-        <a href="/privacy" class="block px-3 py-2 rounded-md bg-sidebar-accent text-sidebar-accent-foreground">
+        <a href="/privacy" class="flex items-center gap-3 px-3 py-2 rounded-md bg-primary text-primary-foreground font-medium">
+          <ShieldCheck class="w-4 h-4" />
           Privacy
         </a>
       </li>
     </ul>
   </nav>
   <main class="ml-64 p-8">
+    <div class="max-w-4xl">
     <h1 class="text-4xl font-bold mb-4">Privacy Policy</h1>
     <p class="text-muted-foreground mb-8">
       Last Updated: March 8, 2026
@@ -48,13 +57,13 @@ import Layout from '../layouts/Layout.astro';
           <strong>We do NOT collect any data.</strong> Period.
         </p>
         <p class="text-muted-foreground mb-4">
-          Your drawings and folders are stored <strong>only</strong> in your browser's local storage (chrome.storage.local). We do not:
+          Your drawings and folders are stored <strong>only</strong> in your browser's local storage (chrome.storage.local). Your data stays on your device:
         </p>
         <ul class="list-none space-y-1 mb-4">
-          <li>❌ Send your drawings to any server</li>
-          <li>❌ Track usage or analytics</li>
-          <li>❌ Collect personal information</li>
-          <li>❌ Use cookies or third-party tracking</li>
+          <li>✅ No servers - your data never leaves your device</li>
+          <li>✅ No tracking - we don't track usage or analytics</li>
+          <li>✅ No personal data - we don't collect personal information</li>
+          <li>✅ No cookies - we don't use cookies or third-party tracking</li>
         </ul>
         <h3 class="text-xl font-semibold mb-2">What Data Is Stored Locally</h3>
         <p class="text-muted-foreground">
@@ -189,6 +198,7 @@ import Layout from '../layouts/Layout.astro';
           Your privacy is not for sale. It's never been, and it never will be.
         </p>
       </section>
+    </div>
     </div>
   </main>
 </Layout>
