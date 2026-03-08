@@ -1,9 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Plus, Replace, Save } from "@lucide/svelte";
+  import { Replace, Save } from "@lucide/svelte";
 
   import { DeleteConfirmDialog, OverwriteConfirmDialog, SavePanel } from "$lib/components/excalivault/dialogs";
-  import { FolderCreation } from "$lib/components/excalivault/list-view";
+  import CurrentDrawing from "$lib/components/excalivault/CurrentDrawing.svelte";
+  import Footer from "$lib/components/excalivault/Footer.svelte";
+  import VaultNavigator from "$lib/components/excalivault/VaultNavigator.svelte";
   import * as ListView from "$lib/components/excalivault/list-view";
   import WelcomeScreen from "$lib/components/excalivault/WelcomeScreen.svelte";
   import { drawings, folders, vaultList } from "$lib/stores";
@@ -39,26 +41,14 @@
 {#if isEmptyVault}
   <WelcomeScreen />
 {:else}
-  <div bind:this={listRef} class="flex h-full flex-col">
+  <div bind:this={listRef} class="flex h-screen flex-col overflow-hidden">
     <ListView.Header />
 
-    <ListView.SearchBar />
-
-    <div class="flex-1 overflow-y-auto">
-      {#if vaultList.creatingFolder}
-        <div class="border-border/50 border-b px-4 py-2.5">
-          <FolderCreation
-            onConfirm={(name, color) => vaultList.handleCreateFolder(name, color)}
-            onCancel={() => (vaultList.creatingFolder = false)}
-          />
-        </div>
-      {/if}
-
-      <ListView.FolderList />
-
-      <ListView.EmptyState type="folder" />
-      <ListView.EmptyState type="search" />
+    <div class="flex flex-1 flex-col overflow-hidden">
+      <VaultNavigator />
     </div>
+
+    <CurrentDrawing />
 
     {#if vaultList.savePanelOpen}
       <SavePanel />
@@ -82,20 +72,10 @@
             Overwrite
           </button>
         </div>
-        <div class="flex items-center justify-between px-4 py-2">
-          <p class="text-muted-foreground/50 text-center font-mono text-[10px]">
-            {drawings.list.length} drawings · {folders.folders.length} folders
-          </p>
-          <button
-            onclick={() => (vaultList.creatingFolder = true)}
-            class="text-muted-foreground/60 hover:bg-secondary hover:text-foreground flex items-center gap-1 rounded px-1.5 py-0.5 font-mono text-[10px] transition-colors"
-          >
-            <Plus size={10} />
-            Folder
-          </button>
-        </div>
       </div>
     {/if}
+
+    <Footer />
 
     {#if vaultList.confirmOpenOpen && vaultList.selectedDrawing}
       <OverwriteConfirmDialog
