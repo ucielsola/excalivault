@@ -409,9 +409,12 @@ export default defineBackground({
                 [DRAWING_TO_INJECT_KEY]: payload,
               })
               .then(async () => {
-                await browser.tabs.create({
-                  url: "https://excalidraw.com/",
-                });
+                const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+                if (tab?.id) {
+                  await browser.tabs.update(tab.id, {
+                    url: "https://excalidraw.com/",
+                  });
+                }
                 return { success: true };
               });
           }

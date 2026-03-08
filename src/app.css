@@ -90,6 +90,10 @@
     @apply bg-background text-foreground;
   }
 
+  button {
+    @apply cursor-pointer;
+  }
+
   /* Folder color utility classes */
   .folder-color-amber {
     color: oklch(0.78 0.16 65);
