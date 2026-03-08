@@ -1,5 +1,6 @@
 <script lang="ts">
   import { dialogStore } from "$lib/stores";
+  import DeleteAllConfirmDialog from "$lib/components/excalivault/dialogs/DeleteAllConfirmDialog.svelte";
   import {
     DeleteConfirmDialog,
     OverwriteConfirmDialog,
@@ -23,6 +24,12 @@
       subfolderDrawingCount={
         dialogStore.activeDialog.data?.drawingCount ?? 0
       }
+      onConfirm={dialogStore.activeDialog.onConfirm}
+      onCancel={dialogStore.activeDialog.onCancel}
+    />
+  {:else if dialogStore.activeDialog.type === "delete_all"}
+    <DeleteAllConfirmDialog
+      open={true}
       onConfirm={dialogStore.activeDialog.onConfirm}
       onCancel={dialogStore.activeDialog.onCancel}
     />

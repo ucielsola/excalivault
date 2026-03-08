@@ -51,13 +51,7 @@
   }
 </script>
 
-<div class="flex h-full flex-col">
-  <div
-    class="border-border flex items-center justify-between border-b px-4 py-3"
-  >
-    <VaultLogo size="small" />
-  </div>
-
+{#if open}
   <Dialog {open}>
     <DialogContent class="max-w-75">
       <DialogHeader>
@@ -125,4 +119,5 @@
       </DialogFooter>
     </DialogContent>
   </Dialog>
-</div>
+{/if}
+

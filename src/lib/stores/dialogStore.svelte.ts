@@ -1,4 +1,4 @@
-type DialogType = "overwrite" | "delete";
+type DialogType = "overwrite" | "delete" | "delete_all";
 
 type DialogConfig = {
   type: DialogType;

@@ -5,3 +5,5 @@ export { drawings } from "$lib/stores/drawings.svelte";
 export { folders } from "$lib/stores/folders.svelte";
 export { vaultActions } from "$lib/stores/vaultActions.svelte";
 export { vaultList } from "$lib/stores/vaultList.svelte";
+export { viewStore } from "$lib/stores/viewStore.svelte";
+export { vaultActionsService } from "$lib/services/vaultActionsService";

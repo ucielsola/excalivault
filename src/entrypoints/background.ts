@@ -563,6 +563,15 @@ export default defineBackground({
             });
           }
 
+          if (typedMessage.type === MessageType.DELETE_ALL_DATA) {
+            return browser.storage.local.remove([
+              "excalivault_drawings",
+              "excalivault_folders",
+              "drawing-id",
+              "excalivault_unsaved_changes",
+            ]).then(() => ({ success: true }));
+          }
+
           return Promise.resolve(null);
         } catch (error) {
           captureException(error as Error);

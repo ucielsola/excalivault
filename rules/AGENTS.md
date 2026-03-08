@@ -10,3 +10,4 @@ This directory contains architectural rules for Excalivault development.
 
 - [State Management](./state-management.md) - Store pattern, async operations, service layer usage
 - [File Structure](./file-structure.md) - src/lib/ organization, naming conventions, import patterns
+- [Dialogs](./dialogs.md) - DialogManager pattern, standalone dialogs, panels, best practices

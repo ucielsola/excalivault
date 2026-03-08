@@ -1,5 +1,6 @@
 import { dialogStore } from "$lib/stores";
-import { drawings, folders, vaultList } from "$lib/stores";
+import { drawings, folders, vaultList, viewStore } from "$lib/stores";
+import { vaultActionsService } from "$lib/services/vaultActionsService";
 import { type DrawingData } from "$lib/types";
 
 class VaultActions {
@@ -280,6 +281,21 @@ class VaultActions {
       console.error("Failed to overwrite:", e);
       vaultList.savingState = "idle";
     }
+  }
+
+  async handleDeleteAllData(): Promise<void> {
+    dialogStore.open(
+      "delete_all",
+      this.confirmDeleteAllData.bind(this),
+      () => {},
+    );
+  }
+
+  async confirmDeleteAllData(): Promise<void> {
+    await vaultActionsService.deleteAllData();
+    await drawings.loadDrawings();
+    await folders.loadFolders();
+    viewStore.resetToMain();
   }
 }
 
