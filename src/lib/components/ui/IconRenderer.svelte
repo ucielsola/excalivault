@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { FolderOpen } from '@lucide/svelte';
+  import { FolderOpen } from "@lucide/svelte";
 
   interface Props {
     name: string;
@@ -10,7 +10,7 @@
 
   let { name, size = 14, color, class: className }: Props = $props();
 
-  let icon = $state<any>(FolderOpen);
+  let icon = $state(FolderOpen);
   let lastIconName = $state<string>("");
 
   async function loadIcon(iconName: string) {
@@ -19,8 +19,10 @@
     lastIconName = iconName;
 
     try {
-      const icons = await import('@lucide/svelte');
-      const iconComponent = icons[iconName as keyof typeof icons];
+      const icons = await import("@lucide/svelte");
+      const iconComponent = icons[
+        iconName as keyof typeof icons
+      ] as typeof FolderOpen;
       if (iconComponent) {
         icon = iconComponent;
       } else {
@@ -28,7 +30,10 @@
         icon = FolderOpen;
       }
     } catch (e) {
-      console.warn(`Error loading icon ${iconName}, falling back to FolderOpen`, e);
+      console.warn(
+        `Error loading icon ${iconName}, falling back to FolderOpen`,
+        e,
+      );
       icon = FolderOpen;
     }
   }
@@ -40,5 +45,5 @@
 
 {#if icon}
   {@const Icon = icon}
-  <svelte:component this={Icon} {size} {color} class={className} />
+  <Icon {size} {color} class={className} />
 {/if}

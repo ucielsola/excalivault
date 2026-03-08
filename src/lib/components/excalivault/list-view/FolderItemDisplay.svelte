@@ -58,7 +58,7 @@
       color={folder.color}
     />
 
-    <span class="truncate text-xs font-medium">{folder.name}</span>
+    <span class="truncate text-xs font-medium {level >= 3 ? 'max-w-[120px]' : ''}">{folder.name}</span>
 
     <span
       class="bg-secondary text-muted-foreground shrink-0 rounded px-1 font-mono text-[9px]"

@@ -11,6 +11,7 @@ class FoldersStore {
   #sortBy = $state<SortBy>("name");
   #sortOrder = $state<SortOrder>("asc");
   #expandedFolders = $state<Set<string>>(new Set());
+  #cachedDrawingCounts = $state<Map<string, number>>(new Map());
 
   public async loadFolders(): Promise<void> {
     this.#loading = true;
@@ -52,6 +53,7 @@ class FoldersStore {
     try {
       const response = await folderService.createFolder(name, parentId, folderColor, icon);
       this.#folders = response.folders;
+      this.invalidateDrawingCountCache();
     } catch (e) {
       this.#folders = this.#folders.filter((f) => f.id !== tempId);
       this.#error = "Failed to create folder";
@@ -75,6 +77,7 @@ class FoldersStore {
     try {
       const response = await folderService.updateFolder(id, name, color, icon);
       this.#folders = response.folders;
+      this.invalidateDrawingCountCache();
     } catch (e) {
       folder.name = originalName;
       folder.color = originalColor;
@@ -141,6 +144,7 @@ class FoldersStore {
       const response = await folderService.deleteFolder(id);
       this.#folders = response.folders;
       drawings.setDrawings(response.drawings);
+      this.invalidateDrawingCountCache();
     } catch (e) {
       this.#folders = previousFolders;
       this.#error = "Failed to delete folder";
@@ -248,6 +252,32 @@ class FoldersStore {
       folders: descendantFolderIds.length,
       drawings: descendantDrawings,
     };
+  }
+
+  getTotalDrawingsCount(folderId: string): number {
+    if (this.#cachedDrawingCounts.has(folderId)) {
+      return this.#cachedDrawingCounts.get(folderId)!;
+    }
+
+    let count = 0;
+    const queue = [folderId];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+      const folderDrawings = drawings.list.filter((d) => d.folderId === currentId);
+      count += folderDrawings.length;
+      const children = this.#folders.filter((f) => f.parentId === currentId);
+      for (const child of children) {
+        queue.push(child.id);
+      }
+    }
+
+    this.#cachedDrawingCounts.set(folderId, count);
+    return count;
+  }
+
+  invalidateDrawingCountCache(): void {
+    this.#cachedDrawingCounts.clear();
   }
 }
 

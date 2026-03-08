@@ -2,7 +2,7 @@ import { defineBackground } from "#imports";
 import browser from "webextension-polyfill";
 
 import { captureException, initSentry } from "$lib/services/sentry";
-import { MessageType, type DrawingMessage } from "$lib/types";
+import { MessageType, type DrawingMessage, type GetDrawingDataResponse } from "$lib/types";
 
 interface SidePanelBrowser {
   sidePanel: {
@@ -417,13 +417,53 @@ export default defineBackground({
           }
 
           if (typedMessage.type === MessageType.DRAWING_CHANGED) {
-            return browser.storage.local
-              .set({
-                "excalivault_unsaved_changes": true,
-              })
-              .then(() => {
-                return { success: true };
+            return Promise.all([
+              browser.storage.local.get("drawing-id"),
+              getDrawings(),
+              browser.tabs.query({ active: true, currentWindow: true }),
+            ]).then(async (results) => {
+              const [{ "drawing-id": activeDrawingId }, drawings, tabs] = results as [
+                { "drawing-id"?: string },
+                unknown[],
+                { id?: number }[],
+              ];
+              const currentTab = tabs[0];
+
+              if (!currentTab?.id) {
+                return { success: false, error: "No active tab" };
+              }
+
+              let hasUnsaved = true;
+              if (activeDrawingId) {
+                // Get current canvas from the content script
+                const canvasData = await browser.tabs.sendMessage(currentTab.id, {
+                  type: MessageType.GET_DRAWING_DATA,
+                }).then((response) => response as GetDrawingDataResponse | null).catch(() => null);
+
+                if (canvasData?.elements) {
+                  // Compare with stored drawing
+                  const storedDrawing = (drawings as { id: string; elements: string }[]).find(
+                    (d) => d.id === activeDrawingId,
+                  );
+                  if (storedDrawing) {
+                    hasUnsaved = canvasData.elements !== storedDrawing.elements;
+                  }
+                }
+              }
+
+              await browser.storage.local.set({
+                "excalivault_unsaved_changes": hasUnsaved,
               });
+
+              return { success: true };
+            }).catch((_error) => {
+              // Fallback: set to true if comparison fails
+              return browser.storage.local
+                .set({
+                  "excalivault_unsaved_changes": true,
+                })
+                .then(() => ({ success: true }));
+            });
           }
 
           return Promise.resolve(null);

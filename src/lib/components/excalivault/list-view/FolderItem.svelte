@@ -21,6 +21,7 @@ let folderDrawings = $derived(vaultList.drawingsInFolder(folder.id));
 let childFolders = $derived(folders.getFolderChildren(folder.id));
 let isCreatingSubfolder = $derived(vaultList.creatingSubfolderId === folder.id);
 let hasContent = $derived(folderDrawings.length > 0 || childFolders.length > 0);
+let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
 </script>
 
 <div>
@@ -41,7 +42,7 @@ let hasContent = $derived(folderDrawings.length > 0 || childFolders.length > 0);
             {folder}
             {level}
             {isExpanded}
-            drawingsCount={folderDrawings.length}
+            drawingsCount={totalDrawingsCount}
             {hasContent}
             onToggle={() => vaultList.toggleFolder(folder.id)}
             onSelect={() => vaultList.handleSelectFolder(folder.id)}
@@ -66,6 +67,12 @@ let hasContent = $derived(folderDrawings.length > 0 || childFolders.length > 0);
   </div>
 
   {#if isExpanded}
+    {#if childFolders.length > 0}
+      {#each childFolders as childFolder (childFolder.id)}
+        <FolderItem folder={childFolder} level={level + 1} />
+      {/each}
+    {/if}
+
     {#if folderDrawings.length > 0}
       <div class="border-border/30 bg-secondary/20 border-b">
         {#each folderDrawings as drawing (drawing.id)}
@@ -76,12 +83,6 @@ let hasContent = $derived(folderDrawings.length > 0 || childFolders.length > 0);
           />
         {/each}
       </div>
-    {/if}
-
-    {#if childFolders.length > 0}
-      {#each childFolders as childFolder (childFolder.id)}
-        <FolderItem folder={childFolder} level={level + 1} />
-      {/each}
     {/if}
   {/if}
 

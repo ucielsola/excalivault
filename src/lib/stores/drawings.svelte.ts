@@ -1,5 +1,6 @@
 import { drawingService } from "$lib/services/drawingService";
 import { captureException } from "$lib/services/sentry";
+import { folders } from "$lib/stores/folders.svelte";
 import {
   type DrawingData,
   type GetDrawingDataResponse,
@@ -13,10 +14,21 @@ class DrawingsStore {
   #list = $state<DrawingData[]>([]);
   #search = $state<string>("");
   #hasUnsavedChanges = $state<boolean>(false);
+  #activeDrawingId = $state<string | null>(null);
 
   constructor() {
+    this.loadActiveDrawingId();
     this.setupStorageListener();
     this.loadUnsavedState();
+  }
+
+  private async loadActiveDrawingId(): Promise<void> {
+    try {
+      const result = await browser.storage.local.get("drawing-id");
+      this.#activeDrawingId = (result["drawing-id"] as string) ?? null;
+    } catch (e) {
+      console.error("[DrawingsStore] Failed to load active drawing ID:", e);
+    }
   }
 
   private async loadUnsavedState(): Promise<void> {
@@ -82,9 +94,15 @@ class DrawingsStore {
     this.#error = null;
 
     try {
-      await drawingService.saveDrawing(data);
+      const response = await drawingService.saveDrawing(data);
       await this.loadDrawings();
       this.#hasUnsavedChanges = false;
+      folders.invalidateDrawingCountCache();
+
+      // If this is a new drawing (not an update), update active drawing ID
+      if (data.id !== this.#activeDrawingId) {
+        this.#activeDrawingId = data.id;
+      }
     } catch (e) {
       this.#error = "Failed to save drawing";
       captureException(e as Error);
@@ -118,6 +136,7 @@ class DrawingsStore {
     try {
       await drawingService.deleteDrawing(id);
       await this.loadDrawings();
+      folders.invalidateDrawingCountCache();
     } catch (e) {
       this.#error = "Failed to delete drawing";
       captureException(e as Error);
@@ -130,6 +149,7 @@ class DrawingsStore {
     try {
       await drawingService.openDrawing(drawing);
       this.#hasUnsavedChanges = false;
+      this.#activeDrawingId = drawing.id;
     } catch (e) {
       this.#error = "Failed to open drawing";
       captureException(e as Error);
@@ -220,6 +240,17 @@ class DrawingsStore {
 
   get hasUnsavedChanges(): boolean {
     return this.#hasUnsavedChanges;
+  }
+
+  get activeDrawingId(): string | null {
+    return this.#activeDrawingId;
+  }
+
+  setActiveDrawingId(id: string | null): void {
+    this.#activeDrawingId = id;
+    browser.storage.local.set({ "drawing-id": id }).catch((e) => {
+      console.error("[DrawingsStore] Failed to sync active drawing ID:", e);
+    });
   }
 
   getDrawingsInFolder(folderId: string | null): DrawingData[] {

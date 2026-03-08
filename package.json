@@ -51,6 +51,7 @@
     "node": "25.7.0"
   },
   "dependencies": {
+    "@lucide/astro": "^0.577.0",
     "@sentry/svelte": "^10.40.0",
     "webextension-polyfill": "^0.12.0"
   }

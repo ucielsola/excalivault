@@ -1,4 +1,4 @@
-import { drawings, folders } from "$lib/stores";
+import { alerts, drawings, folders } from "$lib/stores";
 import { type DrawingData, type FolderData } from "$lib/types";
 
 type SaveMode = "idle" | "new" | "overwrite";
@@ -352,8 +352,9 @@ class VaultListStore {
     try {
       const currentData = await drawings.getCurrentDrawingData();
       if (!currentData?.id) return;
+      const newId = `drawing_${Date.now()}`;
       await drawings.saveDrawing({
-        id: currentData.id,
+        id: newId,
         name: this.#newCopyName.trim(),
         elements: currentData.elements,
         appState: currentData.appState,
@@ -367,6 +368,44 @@ class VaultListStore {
       console.error("Failed to save copy:", e);
       this.#savingState = "idle";
     }
+  }
+
+  async handleSave(): Promise<void> {
+    if (drawings.activeDrawingId) {
+      // Save to active drawing
+      const currentData = await drawings.getCurrentDrawingData();
+      if (!currentData?.id) return;
+      const activeDrawing = drawings.list.find((d) => d.id === drawings.activeDrawingId);
+      await drawings.saveDrawing({
+        id: drawings.activeDrawingId,
+        name: activeDrawing?.name || currentData.title || "Untitled",
+        elements: currentData.elements,
+        appState: currentData.appState,
+        versionFiles: "",
+        versionDataState: "",
+        imageBase64: currentData.imageBase64,
+      });
+    } else {
+      // No active drawing, open save panel for new copy
+      this.openSavePanel("new");
+    }
+  }
+
+  async handleSaveAsNewCopy(): Promise<void> {
+    const currentData = await drawings.getCurrentDrawingData();
+    if (!currentData?.id) return;
+    const newId = `drawing_${Date.now()}`;
+    const newName = `${currentData.title || "Untitled"} (copy)`;
+    await drawings.saveDrawing({
+      id: newId,
+      name: newName,
+      elements: currentData.elements,
+      appState: currentData.appState,
+      versionFiles: "",
+      versionDataState: "",
+      imageBase64: currentData.imageBase64,
+    });
+    alerts.success(`Saved as "${newName}"`);
   }
 
   async handleOverwrite(): Promise<void> {

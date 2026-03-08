@@ -9,10 +9,11 @@
     drawing: DrawingData;
     formatDate: (date: number) => string;
     showFolderBadge?: boolean;
+    isActive?: boolean;
     onOpen: () => void;
   }
 
-  let { drawing, formatDate, showFolderBadge = false, onOpen }: Props =
+  let { drawing, formatDate, showFolderBadge = false, isActive = false, onOpen }: Props =
     $props();
 
   let folderName = $derived(
@@ -41,6 +42,12 @@
       class={getFolderBadgeClass(folderColor) + " shrink-0 rounded px-1.5 font-mono text-[9px]"}
     >
       {folderName}
+    </span>
+  {/if}
+  {#if isActive}
+    <span class="relative flex h-2 w-2 shrink-0">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
     </span>
   {/if}
 </button>
