@@ -18,7 +18,7 @@ export const COLOR_VALUES = Object.values(FOLDER_COLORS) as FolderColorValue[];
 export function getFolderColorStyle(color: string) {
   return {
     color,
-    backgroundColor: `color-mix(in oklch, ${color} 12%, transparent)`,
+    backgroundColor: `color-mix(in oklch, ${color} 18%, transparent)`,
   };
 }
 
@@ -50,7 +50,7 @@ export const FOLDER_COLOR_CLASSES = Object.entries(FOLDER_COLORS)
     ([name, value]) => `
     .folder-color-${name} {
       color: ${value};
-      background-color: color-mix(in oklch, ${value} 12%, transparent);
+      background-color: color-mix(in oklch, ${value} 18%, transparent);
     }
   `,
   )

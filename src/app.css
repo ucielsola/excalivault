@@ -15,15 +15,15 @@
   --primary: oklch(0.78 0.16 65);
   --primary-foreground: oklch(0.13 0.005 260);
   --secondary: oklch(0.22 0.01 260);
-  --secondary-foreground: oklch(0.85 0.02 80);
+  --secondary-foreground: oklch(0.93 0.02 80);
   --muted: oklch(0.2 0.008 260);
-  --muted-foreground: oklch(0.6 0.02 260);
+  --muted-foreground: oklch(0.75 0.02 260);
   --accent: oklch(0.78 0.16 65);
   --accent-foreground: oklch(0.13 0.005 260);
   --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: oklch(0.95 0.01 80);
   --border: oklch(0.25 0.012 260);
-  --input: oklch(0.22 0.01 260);
+  --input: oklch(0.25 0.01 260);
   --ring: oklch(0.78 0.16 65);
   --vault-glow: oklch(0.78 0.16 65 / 0.15);
   --vault-surface: oklch(0.19 0.009 260);
@@ -97,25 +97,25 @@
   /* Folder color utility classes */
   .folder-color-amber {
     color: oklch(0.78 0.16 65);
-    background-color: color-mix(in oklch, oklch(0.78 0.16 65) 12%, transparent);
+    background-color: color-mix(in oklch, oklch(0.78 0.16 65) 18%, transparent);
   }
   .folder-color-mint {
     color: oklch(0.65 0.18 170);
     background-color: color-mix(
       in oklch,
-      oklch(0.65 0.18 170) 12%,
+      oklch(0.65 0.18 170) 18%,
       transparent
     );
   }
   .folder-color-rose {
     color: oklch(0.7 0.16 330);
-    background-color: color-mix(in oklch, oklch(0.7 0.16 330) 12%, transparent);
+    background-color: color-mix(in oklch, oklch(0.7 0.16 330) 18%, transparent);
   }
   .folder-color-sky {
     color: oklch(0.65 0.17 250);
     background-color: color-mix(
       in oklch,
-      oklch(0.65 0.17 250) 12%,
+      oklch(0.65 0.17 250) 18%,
       transparent
     );
   }
@@ -123,19 +123,19 @@
     color: oklch(0.72 0.16 140);
     background-color: color-mix(
       in oklch,
-      oklch(0.72 0.16 140) 12%,
+      oklch(0.72 0.16 140) 18%,
       transparent
     );
   }
   .folder-color-coral {
     color: oklch(0.68 0.15 30);
-    background-color: color-mix(in oklch, oklch(0.68 0.15 30) 12%, transparent);
+    background-color: color-mix(in oklch, oklch(0.68 0.15 30) 18%, transparent);
   }
   .folder-color-indigo {
     color: oklch(0.74 0.14 280);
     background-color: color-mix(
       in oklch,
-      oklch(0.74 0.14 280) 12%,
+      oklch(0.74 0.14 280) 18%,
       transparent
     );
   }
