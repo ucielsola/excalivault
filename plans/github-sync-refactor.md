@@ -27,11 +27,11 @@ interface VaultTreeNode {
 interface GitHubConfig {
   owner: string;
   repo: string;
-  branch: string;  // User-configured (default: 'main')
+  branch: string;
   token?: string;
   lastSyncAt?: number;
   autoSync: boolean;
-  autoSyncDebounceMs: number;  // Default: 30000 (30s)
+  autoSyncDebounceMs: number;
 }
 
 interface SyncResult {
@@ -77,22 +77,25 @@ Create `src/lib/services/githubSyncService.ts`
 class GitHubSyncService {
   connect(owner, repo, branch): Promise<void>
   disconnect(): Promise<void>
-  push(): Promise<SyncResult>    // Local → GitHub
-  pull(): Promise<SyncResult>    // GitHub → Local
-  sync(): Promise<SyncResult>    // Bidirectional, last-wins
-  
+  push(): Promise<SyncResult>
+  pull(): Promise<SyncResult>
+  sync(): Promise<SyncResult>
+
   // Auto-sync
   scheduleAutoSync(): void
   cancelAutoSync(): void
   triggerSync(): Promise<SyncResult>
-  
+
   // Offline handling
   queueChange(change: PendingChange): void
   syncPendingChanges(): Promise<SyncResult>
-  
+
   // Helpers
   private toGitHubTree(folders, drawings): GitHubNode[]
   private fromGitHubTree(nodes): { folders, drawings }
+  private createFolderConfig(folder): .folder-{id}.json
+  private parseFolderConfig(path): FolderData
+  private cleanupOrphanedConfigs(): Promise<void>
   private compareTimestamps(local, remote): 'local' | 'remote'
   private resolveConflict(local, remote, winner): MergedData
 }
@@ -101,20 +104,44 @@ class GitHubSyncService {
 ### File Structure Mapping
 ```
 repo-root/
-  ├── .excalivault.json          # Metadata (folder IDs, sync state)
+  ├── .excalivault.json
   ├── folder-1/
+  │   ├── .folder-def-456.json
   │   ├── subfolder/
+  │   │   ├── .folder-abc-123.json
   │   │   └── drawing.json
   │   └── root-drawing.json
   └── another-drawing.json
 ```
 
+### Per-Folder Config File (`.folder-{id}.json`)
+```json
+{
+  "id": "folder-abc-123",
+  "name": "Design Files",
+  "color": "oklch(0.65 0.15 250)",
+  "icon": "folder-open",
+  "parentId": "folder-def-456",
+  "createdAt": 1234567890,
+  "updatedAt": 1234567900
+}
+```
+
+**Why per-folder configs?**
+- Empty folders preserved in Git
+- Better git diffs (per-folder changes clearly visible)
+- Intuitive repo structure (metadata co-located with content)
+- Better history (track folder evolution independently)
+
+**Orphaned config cleanup:**
+- Detect: `.folder-*.json` where ID not found in localStorage
+- Delete: Single GitHub API call per orphan
+- Run on every full sync
+
 ### Latest Wins Logic
 ```typescript
 if (local.updatedAt > remote.updatedAt) {
-  // local wins, push to GitHub
 } else {
-  // remote wins, pull to local
 }
 ```
 
@@ -152,7 +179,7 @@ class GitHubStore {
   lastSyncAt: number | null
   pendingChanges: PendingChange[]
   syncError: string | null
-  
+
   connect(owner, repo, branch, autoSync): Promise<void>
   disconnect(): Promise<void>
   sync(): Promise<SyncResult>
@@ -186,21 +213,22 @@ Add to `src/lib/types.ts`:
 
 ### GitHub Repo Initialization
 - First sync creates `.excalivault.json` metadata
-- Maps folder IDs to paths for future syncs
-- User selects branch (default: main)
+- Creates `.folder-{id}.json` for each folder
+- User selects branch (required, default: main)
 
-### Metadata File Structure
+### Global Metadata File Structure (`.excalivault.json`)
 ```json
 {
   "version": 1,
-  "folderPaths": {
-    "folder-abc-123": "folder-1/subfolder",
-    "folder-def-456": "folder-1"
-  },
   "branch": "main",
   "lastSyncAt": 1234567890
 }
 ```
+
+### Orphaned Config Cleanup
+- Detect: `.folder-*.json` where ID not found in localStorage
+- Delete: Single GitHub API call per orphan
+- Run on every full sync
 
 ### Hard Deletion Behavior
 - Delete from localStorage immediately
@@ -217,6 +245,9 @@ Add to `src/lib/types.ts`:
 - Conflict resolution
 - Offline change queue
 - Debounce timing
+- Folder config creation/parsing
+- Orphaned config detection/cleanup
+- Empty folder sync
 
 ### Integration Tests
 - Full sync flow (push/pull)
@@ -225,6 +256,8 @@ Add to `src/lib/types.ts`:
 - Offline → online sync recovery
 - Branch switching
 - Edge cases (empty repo, new folder, deleted items)
+- Folder config sync flow
+- Orphan cleanup after folder deletion
 
 ### Manual Testing
 - Real GitHub repo with test data
@@ -242,12 +275,13 @@ Add to `src/lib/types.ts`:
 
 ### Authentication
 - **GitHub OAuth using PKCE flow**: Secure, no secrets in client
+- **Auto-enable on connect**: Sync activates immediately after OAuth
 
 ### Conflict Resolution
 - **Latest wins (by timestamp)**: Compare `updatedAt`, newer overwrites older
 
 ### Branch Strategy
-- **User-configured**: Default to 'main', but user can choose
+- **User-configured**: Branch selector shown on first connection (default: main)
 
 ### Sync Frequency
 - **Auto-sync**: Debounce 30s after changes, manual trigger available
@@ -257,9 +291,15 @@ Add to `src/lib/types.ts`:
 
 ### Offline Handling
 - **Queue changes**: Store pending changes, sync when reconnected
+- **Silent retry**: No notifications for offline errors
 
 ### Delete Handling
 - **Hard deletion**: Permanent, no trash/undo
+
+### Folder Metadata
+- **Per-folder configs**: `.folder-{id}.json` files for name, color, icon
+- **Preserves empty folders**: Git tracks folder + config
+- **Better git history**: Per-folder changes clearly visible
 
 ---
 
