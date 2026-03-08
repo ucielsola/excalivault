@@ -3,11 +3,14 @@
   import { Replace, Save } from "@lucide/svelte";
 
   import { DeleteConfirmDialog, OverwriteConfirmDialog, SavePanel } from "$lib/components/excalivault/dialogs";
+  import AlertContainer from "$lib/components/AlertContainer.svelte";
   import CurrentDrawing from "$lib/components/excalivault/CurrentDrawing.svelte";
   import Footer from "$lib/components/excalivault/Footer.svelte";
   import VaultNavigator from "$lib/components/excalivault/VaultNavigator.svelte";
   import * as ListView from "$lib/components/excalivault/list-view";
   import WelcomeScreen from "$lib/components/excalivault/WelcomeScreen.svelte";
+  import { Button } from "$lib/components/ui/button";
+  import { Tooltip, TooltipContent, TooltipTrigger } from "$lib/components/ui/tooltip";
   import { drawings, folders, vaultList } from "$lib/stores";
 
   let listRef = $state<HTMLDivElement | null>(null);
@@ -50,6 +53,8 @@
 
     <CurrentDrawing />
 
+    <AlertContainer />
+
       {#if vaultList.savePanelOpen}
       <SavePanel />
       {:else}
@@ -58,20 +63,52 @@
           class="border-border/50 flex items-center justify-between border-b px-4 py-2.5"
         >
           <div class="flex items-center gap-2">
-            <button
-              onclick={() => vaultList.openSavePanel("new")}
-              class="bg-primary text-primary-foreground flex items-center justify-center gap-1.5 rounded-md px-3 py-2 text-[11px] font-semibold transition-all hover:brightness-110"
-            >
-              <Save size={12} />
-              Save new copy
-            </button>
-            <button
-              onclick={() => vaultList.openSavePanel("overwrite")}
-              class="bg-secondary text-foreground hover:border-primary/30 hover:bg-secondary/80 border-border flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-[11px] font-medium transition-colors"
-            >
-              <Replace size={12} />
-              Overwrite
-            </button>
+            {#if !drawings.activeDrawingId || drawings.hasUnsavedChanges}
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button
+                    onclick={() => vaultList.handleSave()}
+                    class="bg-primary text-primary-foreground h-7 px-3 text-[11px] font-semibold"
+                  >
+                    <Save size={12} />
+                    Save
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {#if !drawings.activeDrawingId}
+                    Create new drawing
+                  {:else}
+                    Save changes to current drawing
+                  {/if}
+                </TooltipContent>
+              </Tooltip>
+            {:else}
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button
+                    disabled
+                    class="bg-primary text-primary-foreground h-7 px-3 text-[11px] font-semibold"
+                  >
+                    <Save size={12} />
+                    Save
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>No changes to save</TooltipContent>
+              </Tooltip>
+            {/if}
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  variant="outline"
+                  onclick={() => vaultList.handleSaveAsNewCopy()}
+                  class="h-7 px-3 text-[11px] font-medium"
+                >
+                  <Replace size={12} />
+                  Save as new copy
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Create a new copy of current drawing</TooltipContent>
+            </Tooltip>
           </div>
           {#if drawings.hasUnsavedChanges}
             <div
