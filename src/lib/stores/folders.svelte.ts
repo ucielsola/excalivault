@@ -161,6 +161,13 @@ class FoldersStore {
     this.#expandedFolders = new Set(this.#expandedFolders);
   }
 
+  expandFolder(id: string): void {
+    if (!this.#expandedFolders.has(id)) {
+      this.#expandedFolders.add(id);
+      this.#expandedFolders = new Set(this.#expandedFolders);
+    }
+  }
+
   isFolderExpanded(id: string): boolean {
     return this.#expandedFolders.has(id);
   }

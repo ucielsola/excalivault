@@ -4,25 +4,27 @@
   import { type FolderData } from "$lib/types";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
 
-  interface Props {
-    folder: FolderData;
-    level: number;
-    isExpanded: boolean;
-    drawingsCount: number;
-    hasContent: boolean;
-    onToggle: () => void;
-    onSelect: () => void;
-  }
+interface Props {
+  folder: FolderData;
+  level: number;
+  isExpanded: boolean;
+  isSelected: boolean;
+  drawingsCount: number;
+  hasContent: boolean;
+  onToggle: () => void;
+  onSelect: () => void;
+}
 
-  let {
-    folder,
-    level,
-    isExpanded,
-    drawingsCount,
-    hasContent,
-    onToggle,
-    onSelect,
-  }: Props = $props();
+let {
+  folder,
+  level,
+  isExpanded,
+  isSelected,
+  drawingsCount,
+  hasContent,
+  onToggle,
+  onSelect,
+}: Props = $props();
 
   let folderBadgeClass = $derived(getFolderBadgeClass(folder.color));
 </script>
@@ -49,7 +51,7 @@
 
   <button
     onclick={onSelect}
-    class="text-foreground hover:text-primary flex min-w-0 flex-1 items-center gap-2 text-left"
+    class="{isSelected ? 'text-primary' : 'text-foreground'} hover:text-primary flex min-w-0 flex-1 items-center gap-2 text-left"
   >
     <IconRenderer
       name={folder.icon || "FolderOpen"}

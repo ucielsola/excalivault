@@ -3,13 +3,12 @@
   import FolderItem from "$lib/components/excalivault/list-view/FolderItem.svelte";
   import VaultListItem from "$lib/components/excalivault/list-view/VaultListItem.svelte";
 
-  let rootFolders = $derived(vaultList.rootFolders);
-  let rootDrawings = $derived(vaultList.rootDrawings);
-  let isSearching = $derived(vaultList.isSearching);
-  let currentFolderId = $derived(vaultList.currentFolderId);
+let rootFolders = $derived(vaultList.rootFolders);
+let rootDrawings = $derived(vaultList.rootDrawings);
+let isSearching = $derived(vaultList.isSearching);
 </script>
 
-{#if !currentFolderId && !isSearching}
+{#if !isSearching}
   {#each rootFolders as folder (folder.id)}
     <FolderItem {folder} />
   {/each}

@@ -50,7 +50,7 @@
 
     <select bind:value={selectedCategory} class="border-input bg-background rounded border px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary">
       <option value="all">All</option>
-      {#each Object.keys(ICON_CATEGORIES) as category}
+      {#each Object.keys(ICON_CATEGORIES) as category (category)}
         <option value={category}>{category.charAt(0).toUpperCase() + category.slice(1)}</option>
       {/each}
     </select>

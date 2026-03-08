@@ -18,7 +18,7 @@
 
   <div class="flex-1 overflow-y-auto">
     {#if vaultList.creatingFolder}
-      <div class="border-border/50 border-b px-4 py-2.5">
+      <div class="border-border/50 border-b px-4 py-2.5" onkeydown={(e) => e.stopPropagation()} onclick={(e) => e.stopPropagation()}>
         <FolderCreation
           onConfirm={(name, color, icon) => vaultList.handleCreateFolder(name, color, icon)}
           onCancel={() => (vaultList.creatingFolder = false)}

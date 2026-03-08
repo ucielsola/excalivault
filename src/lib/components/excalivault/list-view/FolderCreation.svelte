@@ -45,15 +45,19 @@
 
   function handleKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && name.trim()) {
+      e.stopPropagation();
+      e.preventDefault();
       ignoreBlur = true;
       onConfirm(name.trim(), color, icon);
     }
     if (e.key === "Escape") {
+      e.stopPropagation();
+      e.preventDefault();
       onCancel();
     }
   }
 
-  function handleBlur() {
+  function handleBlur(e: FocusEvent) {
     if (ignoreBlur || justChangedColor || justChangedIcon) {
       ignoreBlur = false;
       justChangedColor = false;
@@ -61,8 +65,10 @@
       return;
     }
     if (name.trim()) {
+      e.stopPropagation();
       onConfirm(name.trim(), color, icon);
     } else {
+      e.stopPropagation();
       onCancel();
     }
   }

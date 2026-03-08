@@ -16,6 +16,7 @@ interface Props {
 let { folder, level = 0 }: Props = $props();
 
 let isExpanded = $derived(vaultList.expandedFolders.has(folder.id));
+let isSelected = $derived(vaultList.currentFolderId === folder.id);
 let isRenaming = $derived(vaultList.renamingId === folder.id);
 let folderDrawings = $derived(vaultList.drawingsInFolder(folder.id));
 let childFolders = $derived(folders.getFolderChildren(folder.id));
@@ -42,10 +43,11 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
             {folder}
             {level}
             {isExpanded}
+            {isSelected}
             drawingsCount={totalDrawingsCount}
             {hasContent}
             onToggle={() => vaultList.toggleFolder(folder.id)}
-            onSelect={() => vaultList.toggleFolder(folder.id)}
+            onSelect={() => vaultList.handleFolderClick(folder.id)}
           />
         {/if}
       </div>
@@ -53,7 +55,7 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
       {#if !isRenaming}
         <FolderItemActions
           onCreateSubfolder={() => {
-            folders.toggleFolder(folder.id);
+            folders.expandFolder(folder.id);
             vaultList.creatingSubfolderId = folder.id;
           }}
           onRename={() => vaultList.startRename(folder.id)}
@@ -87,7 +89,7 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
   {/if}
 
   {#if isCreatingSubfolder}
-    <div class="border-border/50 bg-secondary/10 border-b" style="padding-left: {level * 14}px;">
+    <div class="border-border/50 bg-secondary/10 border-b" style="padding-left: {level * 14}px;" onkeydown={(e) => e.stopPropagation()} onclick={(e) => e.stopPropagation()}>
       <div class="flex items-center gap-2 px-4 py-2.5">
         <div class="h-5 w-5 shrink-0"></div>
         <FolderCreation

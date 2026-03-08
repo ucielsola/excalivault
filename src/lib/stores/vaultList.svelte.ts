@@ -196,11 +196,7 @@ class VaultListStore {
   }
 
   get rootDrawings(): DrawingData[] {
-    return this.filteredDrawings.filter((d) =>
-      this.#currentFolderId
-        ? d.folderId === this.#currentFolderId
-        : d.folderId === null,
-    );
+    return this.filteredDrawings.filter((d) => d.folderId === null);
   }
 
   get rootFolders() {
@@ -287,7 +283,7 @@ class VaultListStore {
 
   async handleCreateFolder(name: string, color?: string, icon?: string): Promise<void> {
     if (this.#currentFolderId) {
-      folders.toggleFolder(this.#currentFolderId);
+      folders.expandFolder(this.#currentFolderId);
     }
     await folders.createFolder(name, this.#currentFolderId, color, icon);
     this.#creatingFolder = false;
@@ -340,6 +336,41 @@ class VaultListStore {
 
   toggleFolder(id: string): void {
     folders.toggleFolder(id);
+  }
+
+  handleFolderClick(folderId: string): void {
+    const folder = folders.folders.find((f) => f.id === folderId);
+    if (!folder) return;
+
+    if (!folder.parentId) {
+      if (this.#currentFolderId && this.isDescendantOf(folderId, this.#currentFolderId)) {
+        this.collapseAllFolders();
+      }
+      this.#currentFolderId = folderId;
+      folders.toggleFolder(folderId);
+    } else {
+      if (this.#currentFolderId === folderId) {
+        folders.toggleFolder(folderId);
+        this.#currentFolderId = folder.parentId;
+      } else {
+        this.#currentFolderId = folderId;
+        folders.toggleFolder(folderId);
+      }
+    }
+  }
+
+  collapseAllFolders(): void {
+    this.#currentFolderId = null;
+  }
+
+  isDescendantOf(ancestorId: string, folderId: string): boolean {
+    let current = folders.getFolderById(folderId);
+    while (current) {
+      if (current.id === ancestorId) return true;
+      if (!current.parentId) break;
+      current = folders.getFolderById(current.parentId);
+    }
+    return false;
   }
 
   openSavePanel(mode: "new" | "overwrite"): void {

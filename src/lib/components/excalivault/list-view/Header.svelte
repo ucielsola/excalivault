@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Settings } from "@lucide/svelte";
-  import { drawings, vaultList } from "$lib/stores";
+  import { drawings } from "$lib/stores";
   import { VaultLogo } from "$lib/components/excalivault/shared";
 
   const totalCount = $derived(drawings.list.length);
