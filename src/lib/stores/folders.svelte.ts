@@ -277,7 +277,7 @@ class FoldersStore {
   }
 
   invalidateDrawingCountCache(): void {
-    this.#cachedDrawingCounts.clear();
+    this.#cachedDrawingCounts = new Map();
   }
 }
 

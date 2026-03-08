@@ -121,6 +121,7 @@ class DrawingsStore {
     try {
       await drawingService.moveDrawing(drawingId, folderId);
       await this.loadDrawings();
+      folders.invalidateDrawingCountCache();
     } catch (e) {
       this.#error = "Failed to move drawing";
       captureException(e as Error);
@@ -189,6 +190,7 @@ class DrawingsStore {
     try {
       await drawingService.duplicateDrawing(drawing);
       await this.loadDrawings();
+      folders.invalidateDrawingCountCache();
     } catch (e) {
       this.#error = "Failed to duplicate drawing";
       captureException(e as Error);
