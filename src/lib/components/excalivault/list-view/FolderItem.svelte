@@ -54,6 +54,7 @@ let totalDrawingsCount = $derived(folders.getTotalDrawingsCount(folder.id));
 
       {#if !isRenaming}
         <FolderItemActions
+          isRoot={folder.isRoot}
           onCreateSubfolder={() => {
             folders.expandFolder(folder.id);
             vaultList.creatingSubfolderId = folder.id;

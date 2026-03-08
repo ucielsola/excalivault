@@ -139,7 +139,28 @@ export default defineBackground({
 
           if (typedMessage.type === MessageType.GET_WORKSPACE) {
             return Promise.all([getDrawings(), getFolders()]).then(
-              ([drawings, folders]) => ({ folders, drawings }),
+              async ([drawings, folders]) => {
+                const typedFolders = folders as Array<Record<string, unknown>>;
+                const ROOT_FOLDER_ID = "root-folder-00000000-0000-0000-0000-000000000000";
+                const existingRoot = typedFolders.find((f) => f.id === ROOT_FOLDER_ID);
+                
+                if (!existingRoot) {
+                  const now = Date.now();
+                  const rootFolder = {
+                    id: ROOT_FOLDER_ID,
+                    name: "My Drawings",
+                    parentId: null,
+                    color: "#10b981",
+                    icon: undefined,
+                    createdAt: now,
+                    updatedAt: now,
+                    isRoot: true,
+                  };
+                  typedFolders.push(rootFolder);
+                  await saveFolders(typedFolders);
+                }
+                return { folders: typedFolders, drawings };
+              },
             );
           }
 
@@ -217,19 +238,42 @@ export default defineBackground({
             };
 
             return getFolders().then(async (folders: unknown[]) => {
+              const typedFolders = folders as Array<Record<string, unknown>>;
+              const targetParentId = payload.parentId ?? null;
+
+              if (targetParentId === null && typedFolders.some((f) => f.isRoot)) {
+                return {
+                  success: false,
+                  folders: typedFolders,
+                  error: "Cannot create top-level folders. Create folders inside the root folder instead.",
+                };
+              }
+
+              const hasDuplicate = typedFolders.some(
+                (f) => f.parentId === targetParentId && f.name === payload.name,
+              );
+
+              if (hasDuplicate) {
+                return {
+                  success: false,
+                  folders: typedFolders,
+                  error: "A folder with this name already exists at this level",
+                };
+              }
+
               const now = Date.now();
               const folder = {
                 id: `folder:${now}-${Math.random().toString(36).substr(2, 9)}`,
                 name: payload.name,
-                parentId: payload.parentId ?? null,
+                parentId: targetParentId,
                 color: payload.color,
                 icon: payload.icon,
                 createdAt: now,
                 updatedAt: now,
               };
-              folders.push(folder);
-              await saveFolders(folders);
-              return { success: true, folders };
+              typedFolders.push(folder);
+              await saveFolders(typedFolders);
+              return { success: true, folders: typedFolders };
             });
           }
 
@@ -272,8 +316,18 @@ export default defineBackground({
 
             return Promise.all([getFolders(), getDrawings()]).then(
               async ([folders, drawings]: [unknown[], unknown[]]) => {
-                const typedFolders = folders as { id: string; parentId: string | null }[];
+                const typedFolders = folders as { id: string; parentId: string | null; isRoot?: boolean }[];
                 const typedDrawings = drawings as { folderId: string | null }[];
+
+                const folderToDelete = typedFolders.find((f) => f.id === payload.id);
+                if (folderToDelete?.isRoot) {
+                  return {
+                    success: false,
+                    folders: typedFolders,
+                    drawings: typedDrawings,
+                    error: "Cannot delete the root folder",
+                  };
+                }
 
                 function getAllDescendantFolderIds(folderId: string): string[] {
                   const ids = [folderId];
@@ -312,21 +366,33 @@ export default defineBackground({
               folderId: string | null;
             };
 
-            return getDrawings().then(async (drawings: unknown[]) => {
-              const index = (drawings as { id: string }[]).findIndex(
-                (d) => d.id === payload.drawingId,
-              );
-              if (index < 0) {
-                return { success: false, drawings };
-              }
-              (drawings as Array<Record<string, unknown>>)[index] = {
-                ...(drawings[index] as object),
-                folderId: payload.folderId,
-                updatedAt: Date.now(),
-              };
-              await saveDrawings(drawings);
-              return { success: true, drawings };
-            });
+            return Promise.all([getDrawings(), getFolders()]).then(
+              async ([drawings, folders]: [unknown[], unknown[]]) => {
+                const typedFolders = folders as Array<Record<string, unknown>>;
+                const ROOT_FOLDER_ID = "root-folder-00000000-0000-0000-0000-000000000000";
+                
+                if (payload.folderId === null && typedFolders.some((f) => f.isRoot)) {
+                  const rootFolder = typedFolders.find((f) => f.id === ROOT_FOLDER_ID);
+                  if (rootFolder) {
+                    payload.folderId = rootFolder.id as string;
+                  }
+                }
+
+                const index = (drawings as { id: string }[]).findIndex(
+                  (d) => d.id === payload.drawingId,
+                );
+                if (index < 0) {
+                  return { success: false, drawings };
+                }
+                (drawings as Array<Record<string, unknown>>)[index] = {
+                  ...(drawings[index] as object),
+                  folderId: payload.folderId,
+                  updatedAt: Date.now(),
+                };
+                await saveDrawings(drawings);
+                return { success: true, drawings };
+              },
+            );
           }
 
           if (message.type === MessageType.GET_DRAWING_DATA) {

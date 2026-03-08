@@ -27,6 +27,7 @@
     onDelete: () => void;
     onChangeColor: (color: string) => void;
     onChangeIcon: (icon: string) => void;
+    isRoot?: boolean;
   }
 
   let {
@@ -35,6 +36,7 @@
     onDelete,
     onChangeColor,
     onChangeIcon,
+    isRoot = false,
   }: Props = $props();
 
   let iconPickerOpen = $state(false);
@@ -81,14 +83,16 @@
       <Pencil size={11} />
       Rename
     </DropdownMenuItem>
-    <DropdownMenuSeparator />
-    <DropdownMenuItem
-      class="text-destructive focus:text-destructive"
-      onclick={onDelete}
-    >
-      <Trash2 size={11} />
-      Delete folder
-    </DropdownMenuItem>
+    {#if !isRoot}
+      <DropdownMenuSeparator />
+      <DropdownMenuItem
+        class="text-destructive focus:text-destructive"
+        onclick={onDelete}
+      >
+        <Trash2 size={11} />
+        Delete folder
+      </DropdownMenuItem>
+    {/if}
   </DropdownMenuContent>
 </DropdownMenu>
 

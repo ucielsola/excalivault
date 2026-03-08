@@ -33,6 +33,16 @@ class FoldersStore {
     color?: string,
     icon?: string,
   ): Promise<void> {
+    const hasRootFolder = this.#folders.some((f) => f.isRoot);
+    
+    if (parentId === null && hasRootFolder) {
+      const rootFolder = this.#folders.find((f) => f.isRoot);
+      if (rootFolder) {
+        parentId = rootFolder.id;
+        this.expandFolder(rootFolder.id);
+      }
+    }
+
     const folderColor =
       color ?? COLOR_VALUES[this.#folders.length % COLOR_VALUES.length];
 
@@ -52,6 +62,11 @@ class FoldersStore {
 
     try {
       const response = await folderService.createFolder(name, parentId, folderColor, icon);
+      if (!response.success) {
+        this.#folders = this.#folders.filter((f) => f.id !== tempId);
+        this.#error = response.error ?? "Failed to create folder";
+        return;
+      }
       this.#folders = response.folders;
       this.invalidateDrawingCountCache();
     } catch (e) {
@@ -136,12 +151,22 @@ class FoldersStore {
     const folder = this.#folders.find((f) => f.id === id);
     if (!folder) return;
 
+    if (folder.isRoot) {
+      this.#error = "Cannot delete the root folder";
+      return;
+    }
+
     const previousFolders = [...this.#folders];
     this.#folders = this.#folders.filter((f) => f.id !== id);
     this.#error = null;
 
     try {
       const response = await folderService.deleteFolder(id);
+      if (!response.success) {
+        this.#folders = previousFolders;
+        this.#error = response.error ?? "Failed to delete folder";
+        return;
+      }
       this.#folders = response.folders;
       drawings.setDrawings(response.drawings);
       this.invalidateDrawingCountCache();

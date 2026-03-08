@@ -13,6 +13,7 @@ export interface FolderData {
   icon?: string;
   createdAt: number;
   updatedAt: number;
+  isRoot?: boolean;
 }
 
 export interface DrawingData {
@@ -211,6 +212,7 @@ export type GetWorkspaceResponse = {
 export type CreateFolderResponse = {
   success: boolean;
   folders: FolderData[];
+  error?: string;
 };
 
 export type UpdateFolderResponse = {
@@ -224,6 +226,7 @@ export type DeleteFolderResponse = {
   drawings: DrawingData[];
   deletedSubfolderCount?: number;
   deletedDrawingCount?: number;
+  error?: string;
 };
 
 export type MoveDrawingResponse = {

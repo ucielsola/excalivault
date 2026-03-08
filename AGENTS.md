@@ -32,7 +32,7 @@ Chrome Extension with 3 entrypoints:
 
 # Key Types
 - `DrawingData`: id, name, elements (JSON string), appState, folderId, timestamps
-- `FolderData`: id, name, parentId, color, icon, timestamps
+- `FolderData`: id, name, parentId, color, icon, timestamps, isRoot
 - `MessageType` enum: Message types for runtime communication
 
 # Coding Rules
