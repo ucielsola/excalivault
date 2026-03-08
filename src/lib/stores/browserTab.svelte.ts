@@ -2,6 +2,7 @@ import browser from "webextension-polyfill";
 
 import { browserTabService } from "$lib/services/browserTabService";
 import { captureException } from "$lib/services/sentry";
+import { drawings } from "$lib/stores";
 
 class BrowserTabStore {
   #isExcalidraw = $state<boolean>(false);
@@ -15,6 +16,7 @@ class BrowserTabStore {
       if (tab.url?.includes("excalidraw.com")) {
         this.#isExcalidraw = true;
         this.#tabId = tabId;
+        drawings.detectActiveDrawingByContent();
       } else {
         this.#isExcalidraw = false;
         this.#tabId = null;

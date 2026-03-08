@@ -1,3 +1,4 @@
+import { computeContentHash } from "$lib/utils/contentHash";
 import { drawingService } from "$lib/services/drawingService";
 import { captureException } from "$lib/services/sentry";
 import { folders } from "$lib/stores/folders.svelte";
@@ -58,6 +59,7 @@ class DrawingsStore {
 
     try {
       this.#list = await drawingService.loadDrawings();
+      this.detectActiveDrawingByContent();
     } catch (e) {
       this.#error = "Failed to load drawings";
       captureException(e as Error);
@@ -253,6 +255,25 @@ class DrawingsStore {
     browser.storage.local.set({ "drawing-id": id }).catch((e) => {
       console.error("[DrawingsStore] Failed to sync active drawing ID:", e);
     });
+  }
+
+  public async detectActiveDrawingByContent(): Promise<void> {
+    try {
+      const currentData = await this.getCurrentDrawingData();
+      if (!currentData?.elements) return;
+
+      const currentHash = await computeContentHash(currentData.elements);
+      const matchingDrawing = this.#list.find((d) => d.contentHash === currentHash);
+
+      if (matchingDrawing) {
+        this.#activeDrawingId = matchingDrawing.id;
+        browser.storage.local.set({ "drawing-id": matchingDrawing.id }).catch((e) => {
+          console.error("[DrawingsStore] Failed to sync active drawing ID:", e);
+        });
+      }
+    } catch (e) {
+      console.error("[DrawingsStore] Failed to detect active drawing by content:", e);
+    }
   }
 
   getDrawingsInFolder(folderId: string | null): DrawingData[] {

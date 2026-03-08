@@ -28,8 +28,9 @@
   );
 
   onMount(async () => {
-    drawings.loadDrawings();
+    await drawings.loadDrawings();
     folders.loadFolders();
+    drawings.detectActiveDrawingByContent();
   });
 
   $effect(() => {

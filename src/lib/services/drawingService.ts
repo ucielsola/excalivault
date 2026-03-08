@@ -1,5 +1,6 @@
 import browser from "webextension-polyfill";
 
+import { computeContentHash } from "$lib/utils/contentHash";
 import {
   MessageType,
   type DeleteDrawingResponse,
@@ -60,9 +61,10 @@ class DrawingService {
   }
 
   public async saveDrawing(data: SaveDrawingData): Promise<void> {
+    const contentHash = await computeContentHash(data.elements);
     await this.sendMessage<SaveDrawingResponse>({
       type: MessageType.SAVE_DRAWING,
-      payload: data,
+      payload: { ...data, contentHash },
     });
   }
 
@@ -97,16 +99,19 @@ class DrawingService {
     imageBase64?: string;
   }): Promise<void> {
     const folderId = this.cache.find((d) => d.id === data.id)?.folderId ?? null;
+    const contentHash = await computeContentHash(data.elements);
     await this.sendMessage<SaveDrawingResponse>({
       type: MessageType.SAVE_DRAWING,
       payload: {
         ...data,
         folderId,
+        contentHash,
       },
     });
   }
 
   public async duplicateDrawing(drawing: DrawingData): Promise<void> {
+    const contentHash = await computeContentHash(drawing.elements);
     await this.sendMessage<SaveDrawingResponse>({
       type: MessageType.SAVE_DRAWING,
       payload: {
@@ -118,6 +123,7 @@ class DrawingService {
         versionDataState: drawing.versionDataState,
         imageBase64: drawing.imageBase64,
         folderId: drawing.folderId ?? null,
+        contentHash,
       },
     });
   }

@@ -1,3 +1,4 @@
+import { computeContentHash } from "$lib/utils/contentHash";
 import { defineBackground } from "#imports";
 import browser from "webextension-polyfill";
 
@@ -27,6 +28,7 @@ export default defineBackground({
 
     migrateDrawings();
     migrateFolders();
+    migrateContentHashes();
 
     (browser as unknown as SidePanelBrowser).sidePanel.setPanelBehavior({
       openPanelOnActionClick: true,
@@ -98,6 +100,22 @@ export default defineBackground({
       await saveFolders(migratedFolders);
     }
 
+    async function migrateContentHashes(): Promise<void> {
+      const drawings = await getDrawings() as Array<Record<string, unknown>>;
+      if (drawings.length === 0) return;
+
+      const needsMigration = drawings.some((d) => !("contentHash" in d) || !d.contentHash);
+      if (!needsMigration) return;
+
+      const migratedDrawings = await Promise.all(
+        drawings.map(async (d) => ({
+          ...d,
+          contentHash: await computeContentHash(d.elements as string),
+        })),
+      );
+      await saveDrawings(migratedDrawings);
+    }
+
     async function getActiveTab(): Promise<unknown> {
       const tabs = await browser.tabs.query({
         active: true,
@@ -136,6 +154,7 @@ export default defineBackground({
               imageBase64?: string;
               viewBackgroundColor?: string;
               folderId?: string | null;
+              contentHash?: string;
             };
 
             return getDrawings().then(async (drawings: unknown[]) => {
@@ -154,6 +173,7 @@ export default defineBackground({
                 versionDataState: payload.versionDataState,
                 imageBase64: payload.imageBase64,
                 viewBackgroundColor: payload.viewBackgroundColor,
+                contentHash: payload.contentHash,
                 createdAt:
                   existingIndex >= 0
                     ? (drawings[existingIndex] as { createdAt: number })
@@ -437,20 +457,27 @@ export default defineBackground({
               }
 
               let hasUnsaved = true;
-              if (activeDrawingId) {
-                // Get current canvas from the content script
-                const canvasData = await browser.tabs.sendMessage(currentTab.id, {
-                  type: MessageType.GET_DRAWING_DATA,
-                }).then((response) => response as GetDrawingDataResponse | null).catch(() => null);
+              const canvasData = await browser.tabs.sendMessage(currentTab.id, {
+                type: MessageType.GET_DRAWING_DATA,
+              }).then((response) => response as GetDrawingDataResponse | null).catch(() => null);
 
-                if (canvasData?.elements) {
-                  // Compare with stored drawing
-                  const storedDrawing = (drawings as { id: string; elements: string }[]).find(
-                    (d) => d.id === activeDrawingId,
-                  );
-                  if (storedDrawing) {
-                    hasUnsaved = canvasData.elements !== storedDrawing.elements;
-                  }
+              if (canvasData?.elements) {
+                // Detect active drawing by content hash
+                const currentHash = await computeContentHash(canvasData.elements);
+                const matchingDrawing = (drawings as { id: string; contentHash?: string }[]).find(
+                  (d) => d.contentHash === currentHash,
+                );
+
+                if (matchingDrawing) {
+                  await browser.storage.local.set({ "drawing-id": matchingDrawing.id });
+                }
+
+                // Compare with stored drawing
+                const storedDrawing = (drawings as { id: string; elements: string }[]).find(
+                  (d) => d.id === activeDrawingId,
+                );
+                if (storedDrawing) {
+                  hasUnsaved = canvasData.elements !== storedDrawing.elements;
                 }
               }
 

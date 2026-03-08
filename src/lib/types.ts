@@ -25,6 +25,7 @@ export interface DrawingData {
   versionDataState: string;
   imageBase64?: string;
   viewBackgroundColor?: string;
+  contentHash?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -63,6 +64,7 @@ export type SaveDrawingMessage = {
     imageBase64?: string;
     viewBackgroundColor?: string;
     folderId?: string | null;
+    contentHash?: string;
   };
 };
 
@@ -119,6 +121,7 @@ export type UpdateDrawingData = {
   versionFiles: string;
   versionDataState: string;
   imageBase64?: string;
+  contentHash?: string;
 };
 
 export type SaveDrawingResponse = {
@@ -140,6 +143,7 @@ export type SaveDrawingData = {
   imageBase64?: string;
   folderId?: string | null;
   viewBackgroundColor?: string;
+  contentHash?: string;
 };
 
 export type GetWorkspaceMessage = {
