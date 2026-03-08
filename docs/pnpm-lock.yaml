@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@lucide/astro':
+    specifier: ^0.577.0
+    version: 0.577.0(astro@5.18.0)
   '@tailwindcss/vite':
     specifier: ^4.2.1
     version: 4.2.1(vite@6.4.1)
@@ -846,6 +849,14 @@ packages:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+    dev: false
+
+  /@lucide/astro@0.577.0(astro@5.18.0):
+    resolution: {integrity: sha512-xZcdx+MyYXY74cBzFxr9N49SlofbGjCVD9GxJZcJA40PJvJSLWSeJpD9bgKFcZfFxf1QXkEYaR6BnCS+0lek8Q==}
+    peerDependencies:
+      astro: ^4 || ^5
+    dependencies:
+      astro: 5.18.0(typescript@5.9.3)
     dev: false
 
   /@oslojs/encoding@1.1.0:
