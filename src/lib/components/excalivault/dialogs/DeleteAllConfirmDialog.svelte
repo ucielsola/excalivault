@@ -1,7 +1,6 @@
 <script lang="ts">
   import { CheckCircle, Trash2Icon, TriangleAlert } from "@lucide/svelte";
 
-  import { VaultLogo } from "$lib/components/excalivault/shared";
   import { Button } from "$lib/components/ui/button";
   import {
     Dialog,
@@ -30,23 +29,11 @@
     confirmText.trim() === CONFIRM_TEXT,
   );
 
-  let handleReset = () => {
-    phase = "confirm";
-    confirmText = "";
-  };
-
-  $effect(() => {
-    if (open) {
-      handleReset();
-    }
-  });
-
   async function handleConfirm() {
     await onConfirm();
     phase = "deleted";
     setTimeout(() => {
       onCancel();
-      handleReset();
     }, 3000);
   }
 

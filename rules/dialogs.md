@@ -28,6 +28,7 @@ type DialogType = "overwrite" | "delete" | "delete_all";
 **Dialog Config**:
 ```typescript
 type DialogConfig = {
+  id: string;
   type: DialogType;
   data?: {
     // Optional data for the dialog
@@ -107,25 +108,35 @@ interface Props {
 ```svelte
 {#if dialogStore.activeDialog}
   {#if dialogStore.activeDialog.type === "overwrite"}
-    <OverwriteConfirmDialog
-      open={true}
-      drawingName={dialogStore.activeDialog.data?.drawingName ?? ""}
-      onConfirm={dialogStore.activeDialog.onConfirm}
-      onCancel={dialogStore.activeDialog.onCancel}
-    />
+    {#key dialogStore.activeDialog.id}
+      <OverwriteConfirmDialog
+        open={true}
+        drawingName={dialogStore.activeDialog.data?.drawingName ?? ""}
+        onConfirm={dialogStore.activeDialog.onConfirm}
+        onCancel={dialogStore.activeDialog.onCancel}
+      />
+    {/key}
   {:else if dialogStore.activeDialog.type === "delete"}
-    <DeleteConfirmDialog
-      open={true}
-      itemName={dialogStore.activeDialog.data?.itemName ?? ""}
-      itemType={dialogStore.activeDialog.data?.itemType ?? "drawing"}
-      subfolderCount={dialogStore.activeDialog.data?.subfolderCount ?? 0}
-      subfolderDrawingCount={dialogStore.activeDialog.data?.drawingCount ?? 0}
-      onConfirm={dialogStore.activeDialog.onConfirm}
-      onCancel={dialogStore.activeDialog.onCancel}
-    />
+    {#key dialogStore.activeDialog.id}
+      <DeleteConfirmDialog
+        open={true}
+        itemName={dialogStore.activeDialog.data?.itemName ?? ""}
+        itemType={dialogStore.activeDialog.data?.itemType ?? "drawing"}
+        subfolderCount={dialogStore.activeDialog.data?.subfolderCount ?? 0}
+        subfolderDrawingCount={dialogStore.activeDialog.data?.drawingCount ?? 0}
+        onConfirm={dialogStore.activeDialog.onConfirm}
+        onCancel={dialogStore.activeDialog.onCancel}
+      />
+    {/key}
   {/if}
 {/if}
 ```
+
+**Key-based Remounting:**
+- Each dialog is wrapped in `{#key dialogStore.activeDialog.id}` 
+- When `dialogStore.open()` is called, a new UUID is generated
+- The key change forces the component to unmount and remount
+- All internal state automatically resets - no manual reset logic needed
 
 ---
 
@@ -472,20 +483,7 @@ dialogStore.open("delete", onConfirm, onCancel, { itemName });
    - `DialogHeader` for consistent header layout
    - `DialogFooter` for button alignment
 
-9. **Reset State on Open** - Always reset local dialog state when `open` prop changes to `true`:
-   ```typescript
-   $effect(() => {
-     if (open) {
-       handleReset();  // Reset phase, inputs, etc.
-     }
-   });
-
-   let handleReset = () => {
-     phase = "confirm";
-     confirmText = "";
-   };
-   ```
-   **CRITICAL**: This prevents bugs where dialog reopens with stale state from previous session
+9. **No Manual State Reset** - DialogManager uses key-based remounting, so components automatically reset when reopened. No `$effect(() => { if (open) handleReset() })` needed.
 
 
 ---

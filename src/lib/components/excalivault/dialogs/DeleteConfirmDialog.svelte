@@ -43,10 +43,6 @@
     phase = "deleted";
   }
 
-  function handleReset() {
-    phase = "confirm";
-  }
-
   let hasSubfolders = $derived(
     itemType === "folder" && (subfolderCount > 0 || subfolderDrawingCount > 0),
   );
@@ -102,23 +98,17 @@
           >Delete forever</Button
         >
       </DialogFooter>
-    {:else}
-      <div class="flex flex-col items-center gap-3 py-4">
-        <div
-          class="bg-destructive/10 flex h-10 w-10 items-center justify-center rounded-full"
-        >
-          <Trash2Icon size={18} class="text-destructive" />
-        </div>
-        <p class="text-muted-foreground text-xs">
-          {itemType === "drawing" ? "Drawing" : "Folder"} deleted.
-        </p>
-        <button
-          onclick={handleReset}
-          class="text-primary text-[11px] underline underline-offset-2"
-        >
-          Reset demo
-        </button>
-      </div>
-    {/if}
+     {:else}
+       <div class="flex flex-col items-center gap-3 py-4">
+         <div
+           class="bg-destructive/10 flex h-10 w-10 items-center justify-center rounded-full"
+         >
+           <Trash2Icon size={18} class="text-destructive" />
+         </div>
+         <p class="text-muted-foreground text-xs">
+           {itemType === "drawing" ? "Drawing" : "Folder"} deleted.
+         </p>
+       </div>
+     {/if}
   </DialogContent>
 </Dialog>

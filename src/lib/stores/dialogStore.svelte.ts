@@ -1,6 +1,7 @@
 type DialogType = "overwrite" | "delete" | "delete_all";
 
 type DialogConfig = {
+  id: string;
   type: DialogType;
   data?: {
     drawingName?: string;
@@ -22,7 +23,7 @@ class DialogStore {
     onCancel: () => void,
     data?: DialogConfig["data"],
   ): void {
-    this.#activeDialog = { type, data, onConfirm, onCancel };
+    this.#activeDialog = { id: crypto.randomUUID(), type, data, onConfirm, onCancel };
   }
 
   close(): void {

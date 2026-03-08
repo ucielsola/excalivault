@@ -9,29 +9,35 @@
 
 {#if dialogStore.activeDialog}
   {#if dialogStore.activeDialog.type === "overwrite"}
-    <OverwriteConfirmDialog
-      open={true}
-      drawingName={dialogStore.activeDialog.data?.drawingName ?? ""}
-      onConfirm={dialogStore.activeDialog.onConfirm}
-      onCancel={dialogStore.activeDialog.onCancel}
-    />
+    {#key dialogStore.activeDialog.id}
+      <OverwriteConfirmDialog
+        open={true}
+        drawingName={dialogStore.activeDialog.data?.drawingName ?? ""}
+        onConfirm={dialogStore.activeDialog.onConfirm}
+        onCancel={dialogStore.activeDialog.onCancel}
+      />
+    {/key}
   {:else if dialogStore.activeDialog.type === "delete"}
-    <DeleteConfirmDialog
-      open={true}
-      itemName={dialogStore.activeDialog.data?.itemName ?? ""}
-      itemType={dialogStore.activeDialog.data?.itemType ?? "drawing"}
-      subfolderCount={dialogStore.activeDialog.data?.subfolderCount ?? 0}
-      subfolderDrawingCount={
-        dialogStore.activeDialog.data?.drawingCount ?? 0
-      }
-      onConfirm={dialogStore.activeDialog.onConfirm}
-      onCancel={dialogStore.activeDialog.onCancel}
-    />
+    {#key dialogStore.activeDialog.id}
+      <DeleteConfirmDialog
+        open={true}
+        itemName={dialogStore.activeDialog.data?.itemName ?? ""}
+        itemType={dialogStore.activeDialog.data?.itemType ?? "drawing"}
+        subfolderCount={dialogStore.activeDialog.data?.subfolderCount ?? 0}
+        subfolderDrawingCount={
+          dialogStore.activeDialog.data?.drawingCount ?? 0
+        }
+        onConfirm={dialogStore.activeDialog.onConfirm}
+        onCancel={dialogStore.activeDialog.onCancel}
+      />
+    {/key}
   {:else if dialogStore.activeDialog.type === "delete_all"}
-    <DeleteAllConfirmDialog
-      open={true}
-      onConfirm={dialogStore.activeDialog.onConfirm}
-      onCancel={dialogStore.activeDialog.onCancel}
-    />
+    {#key dialogStore.activeDialog.id}
+      <DeleteAllConfirmDialog
+        open={true}
+        onConfirm={dialogStore.activeDialog.onConfirm}
+        onCancel={dialogStore.activeDialog.onCancel}
+      />
+    {/key}
   {/if}
 {/if}
