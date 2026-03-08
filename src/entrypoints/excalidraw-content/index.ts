@@ -15,32 +15,50 @@ export default defineContentScript({
       allowUrls: [/chrome-extension:\/\/[a-z]+/, /moz-extension:\/\/[a-z]+/],
     });
     const DRAWING_TO_INJECT_KEY = "excalivault_drawing_to_inject";
+    const SERVICE_NAME = "excalivault-content";
+    const INTERACTION_EVENTS = ["pointerup", "keyup", "click"];
 
     let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
-    const DEBOUNCE_MS = 5000;
+    const DEBOUNCE_MS = 2000;
+
+    function handleInteraction() {
+      const currentExcalidrawValue = localStorage.getItem("excalidraw");
+      if (!currentExcalidrawValue) return;
+
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
+
+      debounceTimeout = setTimeout(() => {
+        browser.runtime
+          .sendMessage({
+            type: MessageType.DRAWING_CHANGED,
+          })
+          .catch((err) => {
+            console.error(
+              "[Excalivault] Failed to notify of drawing change:",
+              err,
+            );
+          });
+      }, DEBOUNCE_MS);
+    }
 
     function monitorDrawingChanges() {
-      let lastExcalidrawValue = localStorage.getItem("excalidraw");
-
-      setInterval(() => {
-        const currentExcalidrawValue = localStorage.getItem("excalidraw");
-        if (currentExcalidrawValue !== lastExcalidrawValue) {
-          lastExcalidrawValue = currentExcalidrawValue;
-
-          if (debounceTimeout) {
-            clearTimeout(debounceTimeout);
-          }
-
-          debounceTimeout = setTimeout(() => {
-            browser.runtime.sendMessage({
-              type: MessageType.DRAWING_CHANGED,
-            }).catch((err) => {
-              console.error("[Excalivault] Failed to notify of drawing change:", err);
-            });
-          }, DEBOUNCE_MS);
-        }
-      }, 3000);
+      INTERACTION_EVENTS.forEach((event) => {
+        document.addEventListener(event, handleInteraction);
+      });
     }
+
+    function cleanup() {
+      if (debounceTimeout) {
+        clearTimeout(debounceTimeout);
+      }
+      INTERACTION_EVENTS.forEach((event) => {
+        document.removeEventListener(event, handleInteraction);
+      });
+    }
+
+    window.addEventListener("beforeunload", cleanup);
 
     async function injectDrawingData() {
       try {
@@ -56,7 +74,7 @@ export default defineContentScript({
 
         if (!dataToInject) {
           captureMessage("[Excalivault] No drawing data to inject", "info", {
-            serviceName: "excalidraw-content",
+            serviceName: SERVICE_NAME,
             methodName: "injectDrawingData",
           });
           return;
@@ -66,7 +84,7 @@ export default defineContentScript({
           "[Excalivault] Injecting drawing data: " + dataToInject.name,
           "info",
           {
-            serviceName: "excalidraw-content",
+            serviceName: SERVICE_NAME,
             methodName: "injectDrawingData",
           },
         );
@@ -87,21 +105,21 @@ export default defineContentScript({
 
         await browser.storage.local.remove(DRAWING_TO_INJECT_KEY);
         await browser.storage.local.set({
-          "excalivault_unsaved_changes": false,
+          excalivault_unsaved_changes: false,
         });
 
         captureMessage(
           "[Excalivault] Drawing data injected, reloading page...",
           "info",
           {
-            serviceName: "excalidraw-content",
+            serviceName: SERVICE_NAME,
             methodName: "injectDrawingData",
           },
         );
         window.location.reload();
       } catch (error) {
         captureException(error as Error, {
-          serviceName: "excalidraw-content",
+          serviceName: SERVICE_NAME,
           methodName: "injectDrawingData",
         });
         console.error("[Excalivault] Failed to inject drawing data:", error);
@@ -111,7 +129,7 @@ export default defineContentScript({
     captureMessage(
       "[Excalivault] Content script running at: " + document.readyState,
       "info",
-      { serviceName: "excalidraw-content", methodName: "main" },
+      { serviceName: SERVICE_NAME, methodName: "main" },
     );
 
     monitorDrawingChanges();

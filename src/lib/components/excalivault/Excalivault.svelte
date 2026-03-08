@@ -2,15 +2,23 @@
   import { onMount } from "svelte";
   import { Replace, Save } from "@lucide/svelte";
 
-  import { DeleteConfirmDialog, OverwriteConfirmDialog, SavePanel } from "$lib/components/excalivault/dialogs";
   import AlertContainer from "$lib/components/AlertContainer.svelte";
   import CurrentDrawing from "$lib/components/excalivault/CurrentDrawing.svelte";
+  import {
+    DeleteConfirmDialog,
+    OverwriteConfirmDialog,
+    SavePanel,
+  } from "$lib/components/excalivault/dialogs";
   import Footer from "$lib/components/excalivault/Footer.svelte";
-  import VaultNavigator from "$lib/components/excalivault/VaultNavigator.svelte";
   import * as ListView from "$lib/components/excalivault/list-view";
+  import VaultNavigator from "$lib/components/excalivault/VaultNavigator.svelte";
   import WelcomeScreen from "$lib/components/excalivault/WelcomeScreen.svelte";
   import { Button } from "$lib/components/ui/button";
-  import { Tooltip, TooltipContent, TooltipTrigger } from "$lib/components/ui/tooltip";
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+  } from "$lib/components/ui/tooltip";
   import { drawings, folders, vaultList } from "$lib/stores";
 
   let listRef = $state<HTMLDivElement | null>(null);
@@ -55,9 +63,9 @@
 
     <AlertContainer />
 
-      {#if vaultList.savePanelOpen}
+    {#if vaultList.savePanelOpen}
       <SavePanel />
-      {:else}
+    {:else}
       <div class="border-border border-t">
         <div
           class="border-border/50 flex items-center justify-between border-b px-4 py-2.5"
@@ -107,20 +115,22 @@
                   Save As
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Create a new copy of current drawing</TooltipContent>
+              <TooltipContent
+                >Create a new copy of current drawing</TooltipContent
+              >
             </Tooltip>
           </div>
           {#if drawings.hasUnsavedChanges}
             <div
-              class="text-destructive bg-destructive/10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium"
+              class="text-destructive bg-destructive/5 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium"
             >
-              <span class="h-1.5 w-1.5 rounded-full bg-destructive"></span>
+              <span class="bg-destructive h-1.5 w-1.5 rounded-full"></span>
               Unsaved changes
             </div>
           {/if}
         </div>
       </div>
-      {/if}
+    {/if}
 
     <Footer />
 
