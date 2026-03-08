@@ -4,3 +4,4 @@ export { default as OverwriteConfirmDialog } from "./OverwriteConfirmDialog.svel
 export { default as SaveCurrent } from "./SaveCurrent.svelte";
 export { default as SavePanel } from "./SavePanel.svelte";
 export { default as FolderSelectDialog } from "./FolderSelectDialog.svelte";
+export { default as FolderSelectItem } from "./FolderSelectItem.svelte";

@@ -20,11 +20,13 @@ class ViewStore {
   goBack(): void {
     if (this.#history.length > 0) {
       this.#currentView = this.#history.pop()!;
+    } else {
+      this.resetToMain();
     }
   }
 
   canGoBack(): boolean {
-    return this.#history.length > 0;
+    return this.#currentView !== "main" || this.#history.length > 0;
   }
 
   resetToMain(): void {

@@ -9,8 +9,8 @@
   import { Button } from "$lib/components/ui/button";
   import { browserTab, drawings } from "$lib/stores";
 
-  import { SaveCurrent } from "./dialogs";
-  import { VaultLogo } from "./shared";
+  import { SaveCurrent } from "$lib/components/excalivault/dialogs";
+  import { VaultLogo } from "$lib/components/excalivault/shared";
 
   let {
     children,

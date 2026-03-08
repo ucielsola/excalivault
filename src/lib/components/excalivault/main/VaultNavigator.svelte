@@ -1,7 +1,9 @@
 <script lang="ts">
   import { Plus } from "@lucide/svelte";
-  import { FolderCreation } from "$lib/components/excalivault/list-view";
-  import * as ListView from "$lib/components/excalivault/list-view";
+  import FolderCreation from "$lib/components/excalivault/main/FolderCreation.svelte";
+  import SearchBar from "$lib/components/excalivault/main/SearchBar.svelte";
+  import FolderList from "$lib/components/excalivault/main/FolderList.svelte";
+  import EmptyState from "$lib/components/excalivault/main/EmptyState.svelte";
   import { vaultActions, vaultList } from "$lib/stores";
 </script>
 
@@ -26,11 +28,11 @@
       </div>
     {/if}
 
-    <ListView.SearchBar />
+    <SearchBar />
 
-    <ListView.FolderList />
+    <FolderList />
 
-    <ListView.EmptyState type="folder" />
-    <ListView.EmptyState type="search" />
+    <EmptyState type="folder" />
+    <EmptyState type="search" />
   </div>
 </div>

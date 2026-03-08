@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import { drawings, folders } from "$lib/stores";
-  import WelcomeScreen from "$lib/components/excalivault/WelcomeScreen.svelte";
+  import WelcomeScreen from "$lib/components/excalivault/welcome/WelcomeScreen.svelte";
 
   interface Props {
     children?: Snippet;

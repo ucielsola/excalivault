@@ -2,8 +2,8 @@
   import type { FolderData } from "$lib/types";
   import { ChevronDown, ChevronRight, FolderOpen } from "@lucide/svelte";
   import { getFolderBadgeClass } from "$lib/utils/folderColors";
-  import FolderSelectItem from "$lib/components/excalivault/list-view/FolderSelectItem.svelte";
   import { folders } from "$lib/stores";
+  import FolderSelectItemSelf from "./FolderSelectItem.svelte";
 
   interface Props {
     folder: FolderData;
@@ -61,7 +61,7 @@
   {#if isExpanded && childFolders.length > 0}
     <div class="ml-4 space-y-1">
       {#each childFolders as childFolder (childFolder.id)}
-        <FolderSelectItem
+        <FolderSelectItemSelf
           folder={childFolder}
           level={level + 1}
           {selectedFolderId}

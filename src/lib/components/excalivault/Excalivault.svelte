@@ -1,12 +1,12 @@
 <script lang="ts">
-  import AlertContainer from "$lib/components/excalivault/AlertContainer.svelte";
+  import AlertContainer from "$lib/components/excalivault/layout/AlertContainer.svelte";
   import { DialogManager } from "$lib/components/excalivault/dialogs";
-  import ExcalivaultContainer from "$lib/components/excalivault/ExcalivaultContainer.svelte";
-  import Footer from "$lib/components/excalivault/Footer.svelte";
-  import MainView from "$lib/components/excalivault/MainView.svelte";
-  import SettingsView from "$lib/components/excalivault/SettingsView.svelte";
-  import VaultHeader from "$lib/components/excalivault/VaultHeader.svelte";
-  import VaultLayout from "$lib/components/excalivault/VaultLayout.svelte";
+  import ExcalivaultContainer from "$lib/components/excalivault/layout/ExcalivaultContainer.svelte";
+  import Footer from "$lib/components/excalivault/layout/Footer.svelte";
+  import MainView from "$lib/components/excalivault/main/MainView.svelte";
+  import SettingsView from "$lib/components/excalivault/settings/SettingsView.svelte";
+  import VaultHeader from "$lib/components/excalivault/layout/VaultHeader.svelte";
+  import VaultLayout from "$lib/components/excalivault/layout/VaultLayout.svelte";
   import { viewStore } from "$lib/stores";
 </script>
 

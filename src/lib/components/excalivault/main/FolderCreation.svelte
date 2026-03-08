@@ -8,9 +8,6 @@
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
   } from "$lib/components/ui/dropdown-menu";
   import IconPickerDialog from "$lib/components/ui/IconPickerDialog.svelte";
@@ -57,7 +54,7 @@
     }
   }
 
-  function handleBlur(e: FocusEvent) {
+  function handleBlur(e: Event) {
     if (ignoreBlur || justChangedColor || justChangedIcon) {
       ignoreBlur = false;
       justChangedColor = false;

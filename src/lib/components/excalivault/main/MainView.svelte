@@ -1,8 +1,8 @@
 <script lang="ts">
   import { SavePanel } from "$lib/components/excalivault/dialogs";
-  import CurrentDrawing from "$lib/components/excalivault/CurrentDrawing.svelte";
-  import SaveActionsBar from "$lib/components/excalivault/SaveActionsBar.svelte";
-  import VaultNavigator from "$lib/components/excalivault/VaultNavigator.svelte";
+  import CurrentDrawing from "$lib/components/excalivault/main/CurrentDrawing.svelte";
+  import SaveActionsBar from "$lib/components/excalivault/main/SaveActionsBar.svelte";
+  import VaultNavigator from "$lib/components/excalivault/main/VaultNavigator.svelte";
   import { vaultList } from "$lib/stores";
 
   interface Props {

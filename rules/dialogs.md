@@ -508,6 +508,10 @@ All dialog components live in: `src/lib/components/excalivault/dialogs/`
 - `KeyboardEventHandler.svelte` - Not a dialog, keyboard shortcut helper
 - `DialogManager.svelte` - Central dialog router
 
+**Dialog sub-components**:
+- `FolderSelectItem.svelte` - Helper for FolderSelectDialog (not exported in index.ts)
+- Sub-components should not be in barrel exports unless used externally
+
 ---
 
 ## Quick Reference

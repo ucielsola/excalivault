@@ -11,7 +11,7 @@
     DialogHeader,
     DialogTitle,
   } from "$lib/components/ui/dialog";
-  import FolderSelectItem from "$lib/components/excalivault/list-view/FolderSelectItem.svelte";
+  import FolderSelectItem from "./FolderSelectItem.svelte";
 
   interface Props {
     open: boolean;

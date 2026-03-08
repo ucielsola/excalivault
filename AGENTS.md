@@ -21,10 +21,16 @@ Chrome Extension with 3 entrypoints:
 - `SettingsView.svelte` - Settings view
 - `Footer.svelte` - Universal footer (counters, folder creation)
 
-**Subdirectory Pattern** (`src/lib/components/excalivault/list-view/`):
-- `SearchBar.svelte`, `FolderList.svelte`, `EmptyState.svelte`
-- Item components: `VaultListItem.*`, `FolderItem.*`
-- Action components: rename, move, delete
+**Subdirectory Pattern** (`src/lib/components/excalivault/`):
+- `main/` - Main vault view components (11 components, flat structure)
+  - View: `MainView.svelte`, `VaultNavigator.svelte`
+  - Drawing: `CurrentDrawing.svelte`, `SaveActionsBar.svelte`
+  - List: `VaultListItem.svelte`, `FolderItem.svelte`, `FolderList.svelte`, `FolderCreation.svelte`, `SearchBar.svelte`, `EmptyState.svelte`
+- `settings/` - Settings view components (2 components, flat)
+- `welcome/` - Welcome/onboarding components (1 component)
+- `dialogs/` - Dialog components (7 components, cross-cutting)
+- `shared/` - Shared utilities (2 components, cross-cutting)
+- `layout/` - Layout components (5 components, cross-cutting)
 
 **Dialogs** (`src/lib/components/excalivault/dialogs/`):
 - Managed by `DialogManager.svelte`

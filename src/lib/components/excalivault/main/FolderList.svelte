@@ -1,7 +1,7 @@
 <script lang="ts">
   import { vaultList } from "$lib/stores";
-  import FolderItem from "$lib/components/excalivault/list-view/FolderItem.svelte";
-  import VaultListItem from "$lib/components/excalivault/list-view/VaultListItem.svelte";
+  import FolderItem from "$lib/components/excalivault/main/FolderItem.svelte";
+  import VaultListItem from "$lib/components/excalivault/main/VaultListItem.svelte";
 
 let rootFolders = $derived(vaultList.rootFolders);
 let rootDrawings = $derived(vaultList.rootDrawings);
