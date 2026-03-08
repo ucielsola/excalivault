@@ -1,6 +1,7 @@
 import path from "path";
 import { defineConfig } from "wxt";
 import tailwindcss from "@tailwindcss/vite";
+import packageJson from "./package.json";
 
 export default defineConfig({
   srcDir: "src",
@@ -17,7 +18,7 @@ export default defineConfig({
   manifest: {
     name: "Excalivault",
     description: "Personal vault for storing Excalidraws",
-    version: "0.0.0",
+    version: packageJson.version,
     permissions: ["storage", "scripting", "activeTab", "sidePanel", "tabs"],
     host_permissions: ["https://excalidraw.com/*"],
     action: {
