@@ -283,6 +283,12 @@ class DrawingsStore {
   getRootDrawings(): DrawingData[] {
     return this.getDrawingsInFolder(null);
   }
+
+  reset(): void {
+    this.#search = "";
+    this.#hasUnsavedChanges = false;
+    this.#activeDrawingId = null;
+  }
 }
 
 export const drawings = new DrawingsStore();

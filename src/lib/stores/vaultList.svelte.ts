@@ -464,6 +464,28 @@ class VaultListStore {
       this.#savingState = "idle";
     }
   }
+
+  reset(): void {
+    this.#menuOpenId = null;
+    this.#selectedDrawing = null;
+    this.#selectedFolder = null;
+    this.#currentFolderId = null;
+    this.#confirmOpenOpen = false;
+    this.#deleteConfirmOpen = false;
+    this.#creatingFolder = false;
+    this.#creatingSubfolderId = null;
+    this.#renamingId = null;
+    this.#savePanelOpen = false;
+    this.#saveMode = "idle";
+    this.#newCopyName = "";
+    this.#overwriteTargetId = null;
+    this.#savingState = "idle";
+    this.#search = "";
+    this.#newCopyInputRef = undefined;
+    this.#deletingFolderSubfolderCount = 0;
+    this.#deletingFolderDrawingCount = 0;
+    this.#saveFolderId = null;
+  }
 }
 
 export const vaultList = new VaultListStore();

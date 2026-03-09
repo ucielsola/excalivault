@@ -311,6 +311,11 @@ class FoldersStore {
   invalidateDrawingCountCache(): void {
     this.#cachedDrawingCounts = new Map();
   }
+
+  reset(): void {
+    this.#expandedFolders = new Set();
+    this.#cachedDrawingCounts = new Map();
+  }
 }
 
 export const folders = new FoldersStore();

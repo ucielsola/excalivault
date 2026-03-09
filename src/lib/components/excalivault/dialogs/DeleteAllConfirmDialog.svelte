@@ -1,6 +1,7 @@
 <script lang="ts">
   import { CheckCircle, Trash2Icon, TriangleAlert } from "@lucide/svelte";
 
+  import { dialogStore } from "$lib/stores";
   import { Button } from "$lib/components/ui/button";
   import {
     Dialog,
@@ -29,6 +30,12 @@
     confirmText.trim() === CONFIRM_TEXT,
   );
 
+  function handleOpenChange(isOpen: boolean) {
+    if (!isOpen) {
+      dialogStore.close();
+    }
+  }
+
   async function handleConfirm() {
     await onConfirm();
     phase = "deleted";
@@ -42,9 +49,9 @@
   }
 </script>
 
-{#if open}
-  <Dialog {open}>
-    <DialogContent class="max-w-75">
+ {#if open}
+   <Dialog {open} onOpenChange={handleOpenChange}>
+     <DialogContent class="max-w-75">
       {#if phase === "confirm"}
         <DialogHeader>
           <div class="flex items-center gap-2.5">

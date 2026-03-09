@@ -296,7 +296,7 @@ class VaultActions {
     dialogStore.open(
       "delete_all",
       this.confirmDeleteAllData.bind(this),
-      () => {},
+      () => dialogStore.close(),
     );
   }
 
@@ -304,7 +304,11 @@ class VaultActions {
     await vaultActionsService.deleteAllData();
     await drawings.loadDrawings();
     await folders.loadFolders();
+    vaultList.reset();
+    folders.reset();
+    drawings.reset();
     viewStore.resetToMain();
+    dialogStore.close();
   }
 }
 
