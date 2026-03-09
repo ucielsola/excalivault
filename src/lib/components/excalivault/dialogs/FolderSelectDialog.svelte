@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { FolderData } from "$lib/types";
   import { FolderX } from "@lucide/svelte";
   import { folders } from "$lib/stores";
   import { Button } from "$lib/components/ui/button";
@@ -18,9 +17,10 @@
     currentFolderId: string | null;
     onMove: (folderId: string | null) => void;
     onCancel: () => void;
+    allowNullSelection?: boolean;
   }
 
-  let { open, currentFolderId, onMove, onCancel }: Props = $props();
+  let { open, currentFolderId, onMove, onCancel, allowNullSelection = true }: Props = $props();
 
   let selectedFolderId = $state<string | null>(currentFolderId);
 
@@ -60,6 +60,7 @@
   }
 
   function handleMove() {
+    if (!allowNullSelection && selectedFolderId === null) return;
     onMove(selectedFolderId);
   }
 </script>
@@ -74,14 +75,16 @@
     </DialogHeader>
 
     <div class="max-h-96 overflow-y-auto">
-      <div
-        class="w-full flex items-center gap-2 rounded px-2 py-1.5 text-left transition-colors cursor-pointer {selectedFolderId === null ? 'bg-primary/10 text-primary' : 'hover:bg-secondary'}"
-        onclick={() => handleSelect(null)}
-      >
-        <div class="h-5 w-5 shrink-0" style="margin-left: 0px;"></div>
-        <FolderX size={14} class="text-muted-foreground shrink-0" />
-        <span class="truncate text-xs font-medium">Unfiled</span>
-      </div>
+      {#if allowNullSelection}
+        <div
+          class="w-full flex items-center gap-2 rounded px-2 py-1.5 text-left transition-colors cursor-pointer {selectedFolderId === null ? 'bg-primary/10 text-primary' : 'hover:bg-secondary'}"
+          onclick={() => handleSelect(null)}
+        >
+          <div class="h-5 w-5 shrink-0" style="margin-left: 0px;"></div>
+          <FolderX size={14} class="text-muted-foreground shrink-0" />
+          <span class="truncate text-xs font-medium">Unfiled</span>
+        </div>
+      {/if}
 
       <div class="space-y-1">
         {#each rootFolders as folder (folder.id)}

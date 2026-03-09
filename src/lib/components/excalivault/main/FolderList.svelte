@@ -1,16 +1,20 @@
 <script lang="ts">
-  import { vaultList } from "$lib/stores";
+  import { fade } from "svelte/transition";
+
   import FolderItem from "$lib/components/excalivault/main/FolderItem.svelte";
   import VaultListItem from "$lib/components/excalivault/main/VaultListItem.svelte";
+  import { vaultList } from "$lib/stores";
 
-let rootFolders = $derived(vaultList.rootFolders);
-let rootDrawings = $derived(vaultList.rootDrawings);
-let isSearching = $derived(vaultList.isSearching);
+  let rootFolders = $derived(vaultList.rootFolders);
+  let rootDrawings = $derived(vaultList.rootDrawings);
+  let isSearching = $derived(vaultList.isSearching);
 </script>
 
 {#if !isSearching}
   {#each rootFolders as folder (folder.id)}
-    <FolderItem {folder} />
+    <div transition:fade|local>
+      <FolderItem {folder} />
+    </div>
   {/each}
 
   {#if rootDrawings.length > 0 && rootFolders.length > 0}
@@ -35,9 +39,7 @@ let isSearching = $derived(vaultList.isSearching);
 {/if}
 
 {#each isSearching ? vaultList.filteredDrawings : rootDrawings as drawing (drawing.id)}
-  <VaultListItem
-    {drawing}
-    indent={false}
-    showFolderBadge={isSearching}
-  />
+  <div transition:fade|local>
+    <VaultListItem {drawing} indent={false} showFolderBadge={isSearching} />
+  </div>
 {/each}

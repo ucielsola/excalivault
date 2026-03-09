@@ -137,4 +137,5 @@
   currentFolderId={drawing.folderId}
   onMove={handleMoveToFolder}
   onCancel={handleCloseMoveDialog}
+  allowNullSelection={false}
 />

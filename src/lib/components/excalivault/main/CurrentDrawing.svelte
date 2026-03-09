@@ -24,8 +24,10 @@
       </div>
     {/if}
   </div>
-{:else}
+  {:else}
   <div class="border-border border-b px-4 py-2.5">
-    <span class="text-muted-foreground/50 font-mono text-[10px]">No drawing loaded</span>
+    <span class="text-muted-foreground/50 font-mono text-[10px]">
+      {drawings.list.length === 0 ? "Save your first drawing" : "No drawing selected"}
+    </span>
   </div>
 {/if}

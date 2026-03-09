@@ -381,7 +381,7 @@ class VaultListStore {
     this.#overwriteTargetId = null;
     this.#newCopyName = "";
     this.#savingState = "idle";
-    this.#saveFolderId = this.#currentFolderId;
+    this.#saveFolderId = this.#currentFolderId ?? folders.folders.find((f) => f.isRoot)?.id ?? folders.folders.find((f) => f.parentId === null)?.id ?? null;
   }
 
   closeSavePanel(): void {

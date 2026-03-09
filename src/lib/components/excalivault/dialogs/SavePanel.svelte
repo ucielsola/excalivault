@@ -185,5 +185,6 @@
     currentFolderId={saveFolderId}
     onMove={handleFolderSelect}
     onCancel={() => (folderSelectOpen = false)}
+    allowNullSelection={false}
   />
 {/if}

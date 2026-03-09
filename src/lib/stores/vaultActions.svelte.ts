@@ -197,7 +197,7 @@ class VaultActions {
     vaultList.overwriteTargetId = null;
     vaultList.newCopyName = "";
     vaultList.savingState = "idle";
-    vaultList.saveFolderId = vaultList.currentFolderId;
+    vaultList.saveFolderId = vaultList.currentFolderId ?? folders.folders.find((f) => f.isRoot)?.id ?? folders.folders.find((f) => f.parentId === null)?.id ?? null;
   }
 
   closeSavePanel(): void {

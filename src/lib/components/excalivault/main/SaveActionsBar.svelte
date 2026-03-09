@@ -44,19 +44,21 @@
         <TooltipContent>No changes to save</TooltipContent>
       </Tooltip>
     {/if}
-    <Tooltip>
-      <TooltipTrigger>
-        <Button
-          variant="outline"
-          onclick={() => vaultActions.handleSaveAsNewCopy()}
-          class="h-7 px-3 text-[11px] font-medium"
-        >
-          <Replace size={12} />
-          Save As
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>Create a new copy of current drawing</TooltipContent>
-    </Tooltip>
+    {#if drawings.activeDrawingId}
+      <Tooltip>
+        <TooltipTrigger>
+          <Button
+            variant="outline"
+            onclick={() => vaultActions.handleSaveAsNewCopy()}
+            class="h-7 px-3 text-[11px] font-medium"
+          >
+            <Replace size={12} />
+            Save As
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Create a new copy of current drawing</TooltipContent>
+      </Tooltip>
+    {/if}
   </div>
   {#if drawings.hasUnsavedChanges}
     <div
