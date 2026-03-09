@@ -178,43 +178,60 @@ export default defineBackground({
               contentHash?: string;
             };
 
-            return getDrawings().then(async (drawings: unknown[]) => {
-              const existingIndex = (drawings as { id: string }[]).findIndex(
-                (d) => d.id === payload.id,
-              );
-              const now = Date.now();
+            return Promise.all([getDrawings(), getFolders()]).then(
+              async ([drawings, folders]: [unknown[], unknown[]]) => {
+                const typedFolders = folders as Array<Record<string, unknown>>;
+                const ROOT_FOLDER_ID = "root-folder-00000000-0000-0000-0000-000000000000";
+                const existingIndex = (drawings as { id: string }[]).findIndex(
+                  (d) => d.id === payload.id,
+                );
+                const now = Date.now();
 
-              const drawing = {
-                id: payload.id,
-                folderId: payload.folderId ?? null,
-                name: payload.name,
-                elements: payload.elements,
-                appState: payload.appState,
-                versionFiles: payload.versionFiles,
-                versionDataState: payload.versionDataState,
-                imageBase64: payload.imageBase64,
-                viewBackgroundColor: payload.viewBackgroundColor,
-                contentHash: payload.contentHash,
-                createdAt:
-                  existingIndex >= 0
-                    ? (drawings[existingIndex] as { createdAt: number })
-                        .createdAt
-                    : now,
-                updatedAt: now,
-              };
+                let folderId = payload.folderId ?? null;
+                
+                if (existingIndex < 0 && folderId === null) {
+                  if (typedFolders.some((f) => f.isRoot)) {
+                    const rootFolder = typedFolders.find(
+                      (f) => f.id === ROOT_FOLDER_ID,
+                    );
+                    if (rootFolder) {
+                      folderId = rootFolder.id as string;
+                    }
+                  }
+                }
 
-              if (existingIndex >= 0) {
-                drawings[existingIndex] = drawing;
-              } else {
-                drawings.push(drawing);
-              }
+                const drawing = {
+                  id: payload.id,
+                  folderId,
+                  name: payload.name,
+                  elements: payload.elements,
+                  appState: payload.appState,
+                  versionFiles: payload.versionFiles,
+                  versionDataState: payload.versionDataState,
+                  imageBase64: payload.imageBase64,
+                  viewBackgroundColor: payload.viewBackgroundColor,
+                  contentHash: payload.contentHash,
+                  createdAt:
+                    existingIndex >= 0
+                      ? (drawings[existingIndex] as { createdAt: number })
+                          .createdAt
+                      : now,
+                  updatedAt: now,
+                };
 
-              await saveDrawings(drawings);
-              await browser.storage.local.set({
-                "excalivault_unsaved_changes": false,
-              });
-              return { success: true, drawings };
-            });
+                if (existingIndex >= 0) {
+                  drawings[existingIndex] = drawing;
+                } else {
+                  drawings.push(drawing);
+                }
+
+                await saveDrawings(drawings);
+                await browser.storage.local.set({
+                  "excalivault_unsaved_changes": false,
+                });
+                return { success: true, drawings };
+              },
+            );
           }
 
           if (typedMessage.type === MessageType.DELETE_DRAWING) {
