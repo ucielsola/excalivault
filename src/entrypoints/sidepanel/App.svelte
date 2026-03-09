@@ -5,6 +5,8 @@
   import { TooltipProvider } from "$lib/components/ui/tooltip";
 </script>
 
-<TooltipProvider>
-  <Excalivault />
-</TooltipProvider>
+<div class="h-dvh">
+  <TooltipProvider>
+    <Excalivault />
+  </TooltipProvider>
+</div>

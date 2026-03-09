@@ -32,4 +32,6 @@
   });
 </script>
 
-{@render children(setListRef)}
+<div class="flex h-full flex-col overflow-hidden">
+  {@render children(setListRef)}
+</div>

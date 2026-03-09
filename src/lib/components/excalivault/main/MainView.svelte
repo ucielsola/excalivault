@@ -13,7 +13,7 @@
   let savePanelOpen = $derived(vaultList.savePanelOpen);
 </script>
 
-<div use:setListRef class="flex h-screen flex-col overflow-hidden">
+<div use:setListRef class="flex h-full flex-col overflow-hidden">
   <div class="flex flex-1 flex-col overflow-hidden">
     <VaultNavigator />
   </div>
