@@ -60,11 +60,29 @@ class DrawingService {
     });
   }
 
-  public async saveDrawing(data: SaveDrawingData): Promise<void> {
+  private async buildSavePayload(data: {
+    id: string;
+    name: string;
+    elements: string;
+    appState: string;
+    versionFiles: string;
+    versionDataState: string;
+    imageBase64?: string;
+    folderId?: string | null;
+  }): Promise<SaveDrawingData> {
     const contentHash = await computeContentHash(data.elements);
+    return {
+      ...data,
+      folderId: data.folderId ?? null,
+      contentHash,
+    };
+  }
+
+  public async saveDrawing(data: SaveDrawingData): Promise<void> {
+    const payload = await this.buildSavePayload(data);
     await this.sendMessage<SaveDrawingResponse>({
       type: MessageType.SAVE_DRAWING,
-      payload: { ...data, contentHash },
+      payload,
     });
   }
 
@@ -99,32 +117,27 @@ class DrawingService {
     imageBase64?: string;
   }): Promise<void> {
     const folderId = this.cache.find((d) => d.id === data.id)?.folderId ?? null;
-    const contentHash = await computeContentHash(data.elements);
+    const payload = await this.buildSavePayload({ ...data, folderId });
     await this.sendMessage<SaveDrawingResponse>({
       type: MessageType.SAVE_DRAWING,
-      payload: {
-        ...data,
-        folderId,
-        contentHash,
-      },
+      payload,
     });
   }
 
   public async duplicateDrawing(drawing: DrawingData): Promise<void> {
-    const contentHash = await computeContentHash(drawing.elements);
+    const payload = await this.buildSavePayload({
+      id: `copy_${Date.now()}`,
+      name: `${drawing.name} (copy)`,
+      elements: drawing.elements,
+      appState: drawing.appState,
+      versionFiles: drawing.versionFiles,
+      versionDataState: drawing.versionDataState,
+      imageBase64: drawing.imageBase64,
+      folderId: drawing.folderId,
+    });
     await this.sendMessage<SaveDrawingResponse>({
       type: MessageType.SAVE_DRAWING,
-      payload: {
-        id: `copy_${Date.now()}`,
-        name: `${drawing.name} (copy)`,
-        elements: drawing.elements,
-        appState: drawing.appState,
-        versionFiles: drawing.versionFiles,
-        versionDataState: drawing.versionDataState,
-        imageBase64: drawing.imageBase64,
-        folderId: drawing.folderId ?? null,
-        contentHash,
-      },
+      payload,
     });
   }
 }

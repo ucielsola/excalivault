@@ -208,22 +208,32 @@ class VaultActions {
     vaultList.savingState = "idle";
   }
 
+  private async buildDrawingPayload(folderId?: string | null) {
+    const currentData = await drawings.getCurrentDrawingData();
+    if (!currentData?.id) return null;
+
+    return {
+      elements: currentData.elements,
+      appState: currentData.appState,
+      versionFiles: "",
+      versionDataState: "",
+      imageBase64: currentData.imageBase64,
+      folderId,
+    };
+  }
+
   async handleSaveNewCopy(): Promise<void> {
     if (!vaultList.newCopyName.trim()) return;
     vaultList.savingState = "saving";
     try {
-      const currentData = await drawings.getCurrentDrawingData();
-      if (!currentData?.id) return;
+      const payload = await this.buildDrawingPayload(vaultList.saveFolderId);
+      if (!payload) return;
+
       const newId = `drawing_${Date.now()}`;
       await drawings.saveDrawing({
         id: newId,
         name: vaultList.newCopyName.trim(),
-        elements: currentData.elements,
-        appState: currentData.appState,
-        versionFiles: "",
-        versionDataState: "",
-        imageBase64: currentData.imageBase64,
-        folderId: vaultList.saveFolderId,
+        ...payload,
       });
       vaultList.savingState = "done";
       setTimeout(() => this.closeSavePanel(), 1200);
@@ -235,11 +245,12 @@ class VaultActions {
 
   async handleSave(): Promise<void> {
     if (drawings.activeDrawingId) {
-      const currentData = await drawings.getCurrentDrawingData();
-      if (!currentData?.id) return;
       const activeDrawing = drawings.list.find(
         (d) => d.id === drawings.activeDrawingId,
       );
+      const currentData = await drawings.getCurrentDrawingData();
+      if (!currentData?.id) return;
+
       await drawings.saveDrawing({
         id: drawings.activeDrawingId,
         name: activeDrawing?.name || currentData.title || "Untitled",
@@ -262,18 +273,16 @@ class VaultActions {
     if (!vaultList.overwriteTargetId) return;
     vaultList.savingState = "saving";
     try {
-      const currentData = await drawings.getCurrentDrawingData();
-      if (!currentData?.id) return;
+      const payload = await this.buildDrawingPayload();
+      if (!payload) return;
+
+      const targetName =
+        drawings.list.find((d) => d.id === vaultList.overwriteTargetId)
+          ?.name || "";
       await drawings.updateDrawing({
         id: vaultList.overwriteTargetId,
-        name:
-          drawings.list.find((d) => d.id === vaultList.overwriteTargetId)
-            ?.name || "",
-        elements: currentData.elements,
-        appState: currentData.appState,
-        versionFiles: "",
-        versionDataState: "",
-        imageBase64: currentData.imageBase64,
+        name: targetName,
+        ...payload,
       });
       vaultList.savingState = "done";
       setTimeout(() => this.closeSavePanel(), 1200);
