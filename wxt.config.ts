@@ -17,28 +17,13 @@ export default defineConfig({
     },
   }),
   manifest: {
-    name: "ExcaliVault",
+    name: "My Extension",
     description: packageJson.description,
     version: packageJson.version,
-    permissions: ["storage", "scripting", "activeTab", "sidePanel", "tabs"],
-    host_permissions: ["https://excalidraw.com/*"],
+    permissions: ["storage", "sidePanel"],
     action: {
-      default_icon: {
-        "16": "icon/16.png",
-        "32": "icon/32.png",
-        "48": "icon/48.png",
-        "96": "icon/96.png",
-        "128": "icon/128.png",
-      },
+      default_title: "My Extension",
     },
     side_panel: {},
-    content_scripts: [
-      {
-        matches: ["https://excalidraw.com/*"],
-        js: ["excalidraw-content.js"],
-        run_at: "document_start",
-        all_frames: true,
-      },
-    ],
   },
 });

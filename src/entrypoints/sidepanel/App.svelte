@@ -1,12 +1,8 @@
-<script>
-  import "../../app.css";
-
-  import Excalivault from "$lib/components/excalivault/Excalivault.svelte";
-  import { TooltipProvider } from "$lib/components/ui/tooltip";
+<script lang="ts">
+  let name = $state("World");
 </script>
 
-<div class="h-dvh">
-  <TooltipProvider>
-    <Excalivault />
-  </TooltipProvider>
+<div class="h-full flex flex-col p-4">
+  <h1 class="text-2xl font-bold mb-4">Hello {name}!</h1>
+  <p class="text-muted-foreground">Your side panel extension is ready.</p>
 </div>
